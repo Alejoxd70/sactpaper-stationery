@@ -2,7 +2,7 @@
 
 Sistema integral de gestión empresarial desarrollado con Laravel 12, React 19 e Inertia.js para la administración de ventas, inventario, clientes y contabilidad.
 
-### 📊 Dashboard
+### Dashboard
 - Vista general con estadísticas en tiempo real
 - Ventas del día
 - Facturas pendientes
