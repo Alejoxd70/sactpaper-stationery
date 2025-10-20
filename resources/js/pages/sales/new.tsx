@@ -41,15 +41,21 @@ export default function NewSale({ products, customers }: NewSaleProps) {
     setItems(items.filter((_, i) => i !== index));
   };
 
-  const updateItem = (index: number, field: string, value: any) => {
+  const updateItem = (index: number, field: string, value: string | number) => {
     const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
 
     if (field === 'product_id') {
-      const product = products.find(p => p.id === parseInt(value));
+      const productId = typeof value === 'string' ? parseInt(value) : value;
+      newItems[index].product_id = String(productId);
+
+      const product = products.find(p => p.id === productId);
       if (product) {
         newItems[index].unit_price = product.unit_price;
       }
+    } else if (field === 'quantity') {
+      newItems[index].quantity = typeof value === 'number' ? value : parseInt(value);
+    } else if (field === 'unit_price') {
+      newItems[index].unit_price = typeof value === 'number' ? value : parseFloat(value);
     }
 
     setItems(newItems);
