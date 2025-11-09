@@ -6,9 +6,13 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
     return Inertia::render('welcome');
 })->name('home');
 
@@ -39,6 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('sales.new');
 
     Route::post('sales', [InvoiceController::class, 'store'])->name('sales.store');
+    Route::get('sales/{invoice}/xml', [InvoiceController::class, 'generateXml'])->name('sales.xml');
+    Route::get('sales/{invoice}/pdf', [InvoiceController::class, 'generatePdf'])->name('sales.pdf');
 
     // Productos
     Route::get('products', function () {

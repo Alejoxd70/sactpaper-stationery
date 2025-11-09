@@ -1,85 +1,85 @@
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-import { useState } from 'react';
-import { BookOpen, ChevronRight, TrendingUp, TrendingDown, ArrowRightLeft } from 'lucide-react';
+import AppLayout from '@/layouts/app-layout'
+import { type BreadcrumbItem } from '@/types'
+import { Head } from '@inertiajs/react'
+import { useState } from 'react'
+import { BookOpen, ChevronRight, TrendingUp, TrendingDown, ArrowRightLeft } from 'lucide-react'
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Contabilidad', href: '/accounting' },
-];
+]
 
 interface Account {
-  id: number;
-  code: string;
-  name: string;
-  type: string;
-  parent_id: number | null;
-  children?: Account[];
+  id: number
+  code: string
+  name: string
+  type: string
+  parent_id: number | null
+  children?: Account[]
 }
 
 interface Transaction {
-  id: number;
-  date: string;
-  description: string;
-  debit: number;
-  credit: number;
-  reference: string;
+  id: number
+  date: string
+  description: string
+  debit: number
+  credit: number
+  reference: string
   account: {
-    code: string;
-    name: string;
-  };
+    code: string
+    name: string
+  }
   user: {
-    name: string;
-  };
+    name: string
+  }
   invoice: {
-    invoice_number: string;
-  } | null;
+    invoice_number: string
+  } | null
 }
 
 interface AccountingIndexProps {
-  accounts: Account[];
-  transactions: Transaction[];
+  accounts: Account[]
+  transactions: Transaction[]
 }
 
 export default function AccountingIndex({ accounts, transactions }: AccountingIndexProps) {
-  const [activeTab, setActiveTab] = useState<'puc' | 'movements'>('puc');
-  const [expandedAccounts, setExpandedAccounts] = useState<number[]>([]);
+  const [activeTab, setActiveTab] = useState<'puc' | 'movements'>('puc')
+  const [expandedAccounts, setExpandedAccounts] = useState<number[]>([])
 
   const toggleAccount = (id: number) => {
     setExpandedAccounts(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
-  };
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id],
+    )
+  }
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'activo': return 'text-blue-600 dark:text-blue-400';
-      case 'pasivo': return 'text-red-600 dark:text-red-400';
-      case 'patrimonio': return 'text-purple-600 dark:text-purple-400';
-      case 'ingreso': return 'text-green-600 dark:text-green-400';
-      case 'gasto': return 'text-orange-600 dark:text-orange-400';
-      case 'costo': return 'text-yellow-600 dark:text-yellow-400';
-      default: return 'text-[#706f6c]';
+      case 'activo': return 'text-blue-600 dark:text-blue-400'
+      case 'pasivo': return 'text-red-600 dark:text-red-400'
+      case 'patrimonio': return 'text-purple-600 dark:text-purple-400'
+      case 'ingreso': return 'text-green-600 dark:text-green-400'
+      case 'gasto': return 'text-orange-600 dark:text-orange-400'
+      case 'costo': return 'text-yellow-600 dark:text-yellow-400'
+      default: return 'text-[#706f6c]'
     }
-  };
+  }
 
   const getTypeLabel = (type: string) => {
-    return type.charAt(0).toUpperCase() + type.slice(1);
-  };
+    return type.charAt(0).toUpperCase() + type.slice(1)
+  }
 
-  const parentAccounts = accounts.filter(a => !a.parent_id);
-  const childAccounts = (parentId: number) => accounts.filter(a => a.parent_id === parentId);
+  const parentAccounts = accounts.filter(a => !a.parent_id)
+  const childAccounts = (parentId: number) => accounts.filter(a => a.parent_id === parentId)
 
   const renderAccount = (account: Account, level: number = 0) => {
-    const children = childAccounts(account.id);
-    const hasChildren = children.length > 0;
-    const isExpanded = expandedAccounts.includes(account.id);
+    const children = childAccounts(account.id)
+    const hasChildren = children.length > 0
+    const isExpanded = expandedAccounts.includes(account.id)
 
     return (
       <div key={account.id}>
         <div
           className={`flex items-center justify-between border-b border-[#19140035] py-3 px-4 hover:bg-[#fafaf9] dark:border-[#3E3E3A] dark:hover:bg-[#1f1f1e] ${level > 0 ? 'pl-' + (4 + level * 4) : ''
-            }`}
+          }`}
           style={{ paddingLeft: `${1 + level * 1.5}rem` }}
         >
           <div className="flex items-center gap-3 flex-1">
@@ -109,8 +109,8 @@ export default function AccountingIndex({ accounts, transactions }: AccountingIn
           </div>
         )}
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -127,9 +127,9 @@ export default function AccountingIndex({ accounts, transactions }: AccountingIn
           <button
             onClick={() => setActiveTab('puc')}
             className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'puc'
-                ? 'border-b-2 border-[#1b1b18] text-[#1b1b18] dark:border-[#EDEDEC] dark:text-[#EDEDEC]'
-                : 'text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]'
-              }`}
+              ? 'border-b-2 border-[#1b1b18] text-[#1b1b18] dark:border-[#EDEDEC] dark:text-[#EDEDEC]'
+              : 'text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]'
+            }`}
           >
             <BookOpen className="mr-2 inline h-4 w-4" />
             Plan de Cuentas (PUC)
@@ -137,9 +137,9 @@ export default function AccountingIndex({ accounts, transactions }: AccountingIn
           <button
             onClick={() => setActiveTab('movements')}
             className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'movements'
-                ? 'border-b-2 border-[#1b1b18] text-[#1b1b18] dark:border-[#EDEDEC] dark:text-[#EDEDEC]'
-                : 'text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]'
-              }`}
+              ? 'border-b-2 border-[#1b1b18] text-[#1b1b18] dark:border-[#EDEDEC] dark:text-[#EDEDEC]'
+              : 'text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]'
+            }`}
           >
             <ArrowRightLeft className="mr-2 inline h-4 w-4" />
             Movimientos Contables
@@ -181,7 +181,7 @@ export default function AccountingIndex({ accounts, transactions }: AccountingIn
                   </tr>
                 </thead>
                 <tbody>
-                  {transactions.map((transaction) => (
+                  {transactions.map(transaction => (
                     <tr
                       key={transaction.id}
                       className="border-b border-[#19140035] last:border-0 dark:border-[#3E3E3A]"
@@ -201,24 +201,30 @@ export default function AccountingIndex({ accounts, transactions }: AccountingIn
                         {transaction.description}
                       </td>
                       <td className="p-4 text-right text-sm">
-                        {transaction.debit > 0 ? (
-                          <span className="flex items-center justify-end gap-1 text-blue-600 dark:text-blue-400">
-                            <TrendingUp className="h-3 w-3" />
-                            ${parseFloat(transaction.debit.toString()).toLocaleString('es-CO', { minimumFractionDigits: 2 })}
-                          </span>
-                        ) : (
-                          <span className="text-[#706f6c] dark:text-[#A1A09A]">-</span>
-                        )}
+                        {transaction.debit > 0
+                          ? (
+                              <span className="flex items-center justify-end gap-1 text-blue-600 dark:text-blue-400">
+                                <TrendingUp className="h-3 w-3" />
+                                $
+                                {parseFloat(transaction.debit.toString()).toLocaleString('es-CO', { minimumFractionDigits: 2 })}
+                              </span>
+                            )
+                          : (
+                              <span className="text-[#706f6c] dark:text-[#A1A09A]">-</span>
+                            )}
                       </td>
                       <td className="p-4 text-right text-sm">
-                        {transaction.credit > 0 ? (
-                          <span className="flex items-center justify-end gap-1 text-green-600 dark:text-green-400">
-                            <TrendingDown className="h-3 w-3" />
-                            ${parseFloat(transaction.credit.toString()).toLocaleString('es-CO', { minimumFractionDigits: 2 })}
-                          </span>
-                        ) : (
-                          <span className="text-[#706f6c] dark:text-[#A1A09A]">-</span>
-                        )}
+                        {transaction.credit > 0
+                          ? (
+                              <span className="flex items-center justify-end gap-1 text-green-600 dark:text-green-400">
+                                <TrendingDown className="h-3 w-3" />
+                                $
+                                {parseFloat(transaction.credit.toString()).toLocaleString('es-CO', { minimumFractionDigits: 2 })}
+                              </span>
+                            )
+                          : (
+                              <span className="text-[#706f6c] dark:text-[#A1A09A]">-</span>
+                            )}
                       </td>
                       <td className="p-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">
                         {transaction.reference}
@@ -232,5 +238,5 @@ export default function AccountingIndex({ accounts, transactions }: AccountingIn
         )}
       </div>
     </AppLayout>
-  );
+  )
 }

@@ -1,71 +1,71 @@
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-import { TrendingUp, Package, AlertCircle } from 'lucide-react';
-import { useState } from 'react';
+import AppLayout from '@/layouts/app-layout'
+import { type BreadcrumbItem } from '@/types'
+import { Head } from '@inertiajs/react'
+import { TrendingUp, Package, AlertCircle } from 'lucide-react'
+import { useState } from 'react'
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Reportes', href: '/reports' },
-];
+]
 
 interface ReportsData {
   sales: {
-    total: number;
-    count: number;
-    average: number;
+    total: number
+    count: number
+    average: number
     by_payment_method: {
-      cash: number;
-      card: number;
-      transfer: number;
-      credit: number;
-    };
-    pending: number;
-  };
+      cash: number
+      card: number
+      transfer: number
+      credit: number
+    }
+    pending: number
+  }
   inventory: {
-    total_value: number;
-    low_stock_count: number;
-  };
+    total_value: number
+    low_stock_count: number
+  }
   top_products: Array<{
-    name: string;
-    quantity: number;
-    revenue: number;
-  }>;
+    name: string
+    quantity: number
+    revenue: number
+  }>
   profit_loss: {
-    income: number;
-    costs: number;
-    gross_profit: number;
-    expenses: number;
-    net_profit: number;
-    margin: number;
-  };
+    income: number
+    costs: number
+    gross_profit: number
+    expenses: number
+    net_profit: number
+    margin: number
+  }
 }
 
-export default function ReportsIndex({ data, startDate: initialStartDate, endDate: initialEndDate }: { data: ReportsData; startDate: string; endDate: string }) {
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+export default function ReportsIndex({ data, startDate: initialStartDate, endDate: initialEndDate }: { data: ReportsData, startDate: string, endDate: string }) {
+  const [startDate, setStartDate] = useState(initialStartDate)
+  const [endDate, setEndDate] = useState(initialEndDate)
 
   const handleFilterChange = () => {
     if (startDate && endDate) {
-      window.location.href = `/reports?start_date=${startDate}&end_date=${endDate}`;
+      window.location.href = `/reports?start_date=${startDate}&end_date=${endDate}`
     }
-  };
+  }
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: 'COP',
       minimumFractionDigits: 0,
-    }).format(value);
-  };
+    }).format(value)
+  }
 
   const paymentMethods = [
     { key: 'cash', label: 'Efectivo', value: data.sales.by_payment_method.cash },
     { key: 'card', label: 'Tarjeta', value: data.sales.by_payment_method.card },
     { key: 'transfer', label: 'Transferencia', value: data.sales.by_payment_method.transfer },
     { key: 'credit', label: 'Crédito', value: data.sales.by_payment_method.credit },
-  ];
+  ]
 
-  const maxPaymentValue = Math.max(...paymentMethods.map(pm => pm.value));
+  const maxPaymentValue = Math.max(...paymentMethods.map(pm => pm.value))
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -77,14 +77,14 @@ export default function ReportsIndex({ data, startDate: initialStartDate, endDat
             <input
               type="date"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={e => setStartDate(e.target.value)}
               className="rounded-lg border border-sidebar-border/70 bg-white px-3 py-2 text-sm dark:border-sidebar-border dark:bg-[#161615] dark:text-[#EDEDEC]"
               placeholder="Desde"
             />
             <input
               type="date"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={e => setEndDate(e.target.value)}
               className="rounded-lg border border-sidebar-border/70 bg-white px-3 py-2 text-sm dark:border-sidebar-border dark:bg-[#161615] dark:text-[#EDEDEC]"
               placeholder="Hasta"
             />
@@ -210,7 +210,9 @@ export default function ReportsIndex({ data, startDate: initialStartDate, endDat
                       {product.name}
                     </p>
                     <p className="text-xs text-[#706f6c] dark:text-[#A1A09A]">
-                      {product.quantity} unidades
+                      {product.quantity}
+                      {' '}
+                      unidades
                     </p>
                   </div>
                   <p className="text-sm font-bold text-[#1b1b18] dark:text-[#EDEDEC]">
@@ -264,7 +266,8 @@ export default function ReportsIndex({ data, startDate: initialStartDate, endDat
                   {formatCurrency(data.profit_loss.net_profit)}
                 </p>
                 <p className={`text-sm font-medium ${data.profit_loss.margin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {data.profit_loss.margin.toFixed(2)}% margen
+                  {data.profit_loss.margin.toFixed(2)}
+                  % margen
                 </p>
               </div>
             </div>
@@ -272,5 +275,5 @@ export default function ReportsIndex({ data, startDate: initialStartDate, endDat
         </div>
       </div>
     </AppLayout>
-  );
+  )
 }
