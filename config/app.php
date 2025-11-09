@@ -123,4 +123,24 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Company Information
+    |--------------------------------------------------------------------------
+    |
+    | This information is used for generating electronic invoices and other
+    | company-related documents.
+    |
+    */
+
+    'company' => [
+        'name' => env('COMPANY_NAME', 'PAPELERÍA SACT'),
+        'nit' => env('COMPANY_NIT', '900123456'),
+        'address' => env('COMPANY_ADDRESS', 'Carrera 6 # 10-55'),
+        'city' => env('COMPANY_CITY', 'CHÍA'),
+        'department' => env('COMPANY_DEPARTMENT', 'CUNDINAMARCA'),
+        'phone' => env('COMPANY_PHONE', '3001234567'),
+        'email' => env('COMPANY_EMAIL', 'sact@sact.com'),
+    ],
+
 ];

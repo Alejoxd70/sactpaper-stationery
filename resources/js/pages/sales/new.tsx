@@ -1,79 +1,81 @@
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import AppLayout from '@/layouts/app-layout'
+import { type BreadcrumbItem } from '@/types'
+import { Head, Link, router } from '@inertiajs/react'
+import { useState } from 'react'
+import { Plus, Trash2 } from 'lucide-react'
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Ventas', href: '/sales' },
   { title: 'Nueva Venta', href: '/sales/new' },
-];
+]
 
 interface Product {
-  id: number;
-  name: string;
-  code: string;
-  unit_price: number;
-  stock: number;
+  id: number
+  name: string
+  code: string
+  unit_price: number
+  stock: number
 }
 
 interface Customer {
-  id: number;
-  name: string;
-  document_number: string;
+  id: number
+  name: string
+  document_number: string
 }
 
 interface NewSaleProps {
-  products: Product[];
-  customers: Customer[];
+  products: Product[]
+  customers: Customer[]
 }
 
 export default function NewSale({ products, customers }: NewSaleProps) {
-  const [customerId, setCustomerId] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('cash');
-  const [items, setItems] = useState<Array<{ product_id: string; quantity: number; unit_price: number }>>([]);
+  const [customerId, setCustomerId] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState('cash')
+  const [items, setItems] = useState<Array<{ product_id: string, quantity: number, unit_price: number }>>([])
 
   const addItem = () => {
-    setItems([...items, { product_id: '', quantity: 1, unit_price: 0 }]);
-  };
+    setItems([...items, { product_id: '', quantity: 1, unit_price: 0 }])
+  }
 
   const removeItem = (index: number) => {
-    setItems(items.filter((_, i) => i !== index));
-  };
+    setItems(items.filter((_, i) => i !== index))
+  }
 
   const updateItem = (index: number, field: string, value: string | number) => {
-    const newItems = [...items];
+    const newItems = [...items]
 
     if (field === 'product_id') {
-      const productId = typeof value === 'string' ? parseInt(value) : value;
-      newItems[index].product_id = String(productId);
+      const productId = typeof value === 'string' ? parseInt(value) : value
+      newItems[index].product_id = String(productId)
 
-      const product = products.find(p => p.id === productId);
+      const product = products.find(p => p.id === productId)
       if (product) {
-        newItems[index].unit_price = product.unit_price;
+        newItems[index].unit_price = product.unit_price
       }
-    } else if (field === 'quantity') {
-      newItems[index].quantity = typeof value === 'number' ? value : parseInt(value);
-    } else if (field === 'unit_price') {
-      newItems[index].unit_price = typeof value === 'number' ? value : parseFloat(value);
+    }
+    else if (field === 'quantity') {
+      newItems[index].quantity = typeof value === 'number' ? value : parseInt(value)
+    }
+    else if (field === 'unit_price') {
+      newItems[index].unit_price = typeof value === 'number' ? value : parseFloat(value)
     }
 
-    setItems(newItems);
-  };
+    setItems(newItems)
+  }
 
-  const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
-  const tax = subtotal * 0.19;
-  const total = subtotal + tax;
+  const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0)
+  const tax = subtotal * 0.19
+  const total = subtotal + tax
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     // Validar stock antes de enviar
     for (const item of items) {
-      const product = products.find(p => p.id === parseInt(item.product_id));
+      const product = products.find(p => p.id === parseInt(item.product_id))
       if (product && item.quantity > product.stock) {
-        alert(`Stock insuficiente para ${product.name}.\nDisponible: ${product.stock}\nSolicitado: ${item.quantity}`);
-        return;
+        alert(`Stock insuficiente para ${product.name}.\nDisponible: ${product.stock}\nSolicitado: ${item.quantity}`)
+        return
       }
     }
 
@@ -86,8 +88,8 @@ export default function NewSale({ products, customers }: NewSaleProps) {
         quantity: item.quantity,
         unit_price: item.unit_price,
       })),
-    });
-  };
+    })
+  }
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -101,13 +103,19 @@ export default function NewSale({ products, customers }: NewSaleProps) {
               <label className="mb-2 block text-sm text-[#706f6c] dark:text-[#A1A09A]">Cliente</label>
               <select
                 value={customerId}
-                onChange={(e) => setCustomerId(e.target.value)}
+                onChange={e => setCustomerId(e.target.value)}
                 className="w-full rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
                 required
               >
                 <option value="">Seleccionar cliente</option>
                 {customers.map(c => (
-                  <option key={c.id} value={c.id}>{c.name} - {c.document_number}</option>
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                    {' '}
+                    -
+                    {' '}
+                    {c.document_number}
+                  </option>
                 ))}
               </select>
             </div>
@@ -116,7 +124,7 @@ export default function NewSale({ products, customers }: NewSaleProps) {
               <label className="mb-2 block text-sm text-[#706f6c] dark:text-[#A1A09A]">Método de Pago</label>
               <select
                 value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
+                onChange={e => setPaymentMethod(e.target.value)}
                 className="w-full rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
               >
                 <option value="cash">Efectivo</option>
@@ -141,28 +149,38 @@ export default function NewSale({ products, customers }: NewSaleProps) {
             </div>
 
             {items.map((item, index) => {
-              const selectedProduct = products.find(p => p.id === parseInt(item.product_id));
-              const hasStockError = selectedProduct && item.quantity > selectedProduct.stock;
+              const selectedProduct = products.find(p => p.id === parseInt(item.product_id))
+              const hasStockError = selectedProduct && item.quantity > selectedProduct.stock
 
               return (
                 <div key={index} className="mb-3">
                   <div className="flex gap-3">
                     <select
                       value={item.product_id}
-                      onChange={(e) => updateItem(index, 'product_id', e.target.value)}
+                      onChange={e => updateItem(index, 'product_id', e.target.value)}
                       className="flex-1 rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
                       required
                     >
                       <option value="">Seleccionar producto</option>
                       {products.map(p => (
-                        <option key={p.id} value={p.id}>{p.name} - ${p.unit_price} (Stock: {p.stock})</option>
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                          {' '}
+                          - $
+                          {p.unit_price}
+                          {' '}
+                          (Stock:
+                          {' '}
+                          {p.stock}
+                          )
+                        </option>
                       ))}
                     </select>
 
                     <input
                       type="number"
                       value={item.quantity}
-                      onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value))}
+                      onChange={e => updateItem(index, 'quantity', parseInt(e.target.value))}
                       className={`w-24 rounded-sm border px-4 py-2 ${hasStockError ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-[#19140035] bg-white dark:border-[#3E3E3A] dark:bg-[#161615]'} text-[#1b1b18] dark:text-[#EDEDEC]`}
                       min="1"
                       max={selectedProduct?.stock || undefined}
@@ -172,7 +190,7 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                     <input
                       type="number"
                       value={item.unit_price}
-                      onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value))}
+                      onChange={e => updateItem(index, 'unit_price', parseFloat(e.target.value))}
                       className="w-32 rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
                       step="0.01"
                       required
@@ -188,26 +206,37 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                   </div>
                   {hasStockError && (
                     <p className="mt-1 text-xs text-red-500">
-                      ⚠️ Stock insuficiente. Disponible: {selectedProduct.stock}
+                      ⚠️ Stock insuficiente. Disponible:
+                      {' '}
+                      {selectedProduct.stock}
                     </p>
                   )}
                 </div>
-              );
+              )
             })}
           </div>
 
           <div className="mb-6 rounded-sm border border-[#19140035] bg-[#fafaf9] p-4 dark:border-[#3E3E3A] dark:bg-[#1f1f1e]">
             <div className="flex justify-between text-sm">
               <span className="text-[#706f6c] dark:text-[#A1A09A]">Subtotal:</span>
-              <span className="text-[#1b1b18] dark:text-[#EDEDEC]">${subtotal.toFixed(2)}</span>
+              <span className="text-[#1b1b18] dark:text-[#EDEDEC]">
+                $
+                {subtotal.toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-[#706f6c] dark:text-[#A1A09A]">IVA (19%):</span>
-              <span className="text-[#1b1b18] dark:text-[#EDEDEC]">${tax.toFixed(2)}</span>
+              <span className="text-[#1b1b18] dark:text-[#EDEDEC]">
+                $
+                {tax.toFixed(2)}
+              </span>
             </div>
             <div className="mt-2 flex justify-between border-t border-[#19140035] pt-2 text-lg font-semibold dark:border-[#3E3E3A]">
               <span className="text-[#1b1b18] dark:text-[#EDEDEC]">Total:</span>
-              <span className="text-[#1b1b18] dark:text-[#EDEDEC]">${total.toFixed(2)}</span>
+              <span className="text-[#1b1b18] dark:text-[#EDEDEC]">
+                $
+                {total.toFixed(2)}
+              </span>
             </div>
           </div>
 
@@ -228,5 +257,5 @@ export default function NewSale({ products, customers }: NewSaleProps) {
         </form>
       </div>
     </AppLayout>
-  );
+  )
 }
