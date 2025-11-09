@@ -14,15 +14,45 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // Crear usuario administrador por defecto
         User::firstOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'admin@sactpaper.com'],
             [
-                'name' => 'Test User',
-                'password' => Hash::make('password'),
+                'name' => 'Administrador',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+                'is_active' => true,
                 'email_verified_at' => now(),
             ]
         );
+
+        // Crear usuarios de ejemplo
+        User::firstOrCreate(
+            ['email' => 'contadora@sactpaper.com'],
+            [
+                'name' => 'Contadora',
+                'password' => Hash::make('password'),
+                'role' => 'accountant',
+                'is_active' => true,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'cajero@sactpaper.com'],
+            [
+                'name' => 'Cajero',
+                'password' => Hash::make('password'),
+                'role' => 'cashier',
+                'is_active' => true,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Ejecutar seeders de clientes y productos
+        $this->call([
+            CustomerSeeder::class,
+            ProductSeeder::class,
+        ]);
     }
 }

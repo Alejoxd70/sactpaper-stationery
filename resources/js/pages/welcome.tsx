@@ -1,6 +1,7 @@
-import { login, register } from '@/routes'
+import { login } from '@/routes'
 import { type SharedData } from '@/types'
 import { Head, Link, usePage } from '@inertiajs/react'
+import { ShoppingCart, Package, FileText, BarChart3, TrendingUp, UserCog } from 'lucide-react'
 
 export default function Welcome() {
   const { auth } = usePage<SharedData>().props
@@ -23,25 +24,25 @@ export default function Welcome() {
             <div className="rounded-lg bg-white p-8 pb-12 shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:p-16 dark:bg-[#161615] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
               <div className="text-center mb-12">
                 <h1 className="mb-4 text-4xl font-semibold text-[#1b1b18] lg:text-5xl dark:text-[#EDEDEC]">
-                  PAPERSACT
+                  SACTPAPER
                 </h1>
                 <p className="mb-6 text-xl text-[#706f6c] lg:text-2xl dark:text-[#A1A09A]">
-                  Gestión contable inteligente para tu papelería
+                  Sistema de gestión integral para papelerías
                 </p>
                 <p className="mx-auto max-w-2xl text-[15px] leading-relaxed text-[#706f6c] dark:text-[#A1A09A]">
-                  Controla inventario, ventas y finanzas en tiempo real. Diseñado específicamente para papelerías que buscan eficiencia y crecimiento.
+                  Administra inventario, ventas, facturación electrónica y contabilidad. Sistema completo con roles de usuario y control total de tu negocio.
                 </p>
               </div>
 
               {/* CTA Buttons */}
               {!auth.user && (
                 <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-                  <Link
+                  {/* <Link
                     href={register()}
                     className="inline-block rounded-sm border border-[#1b1b18] bg-[#1b1b18] px-8 py-3 text-sm font-medium leading-normal text-white hover:bg-[#2d2d28] dark:border-[#EDEDEC] dark:bg-[#EDEDEC] dark:text-[#1b1b18] dark:hover:bg-[#d4d4d0]"
                   >
                     Registrarse
-                  </Link>
+                  </Link> */}
                   <Link
                     href={login()}
                     className="inline-block rounded-sm border border-[#19140035] px-8 py-3 text-sm font-medium leading-normal text-[#1b1b18] hover:border-[#1915014a] hover:bg-[#fafaf9] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] dark:hover:bg-[#1f1f1e]"
@@ -54,62 +55,74 @@ export default function Welcome() {
               {/* Features Grid */}
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="rounded-sm border border-[#19140035] p-6 dark:border-[#3E3E3A]">
-                  <div className="mb-3 text-2xl">📊</div>
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-[#1b1b18]/5 dark:bg-[#EDEDEC]/5">
+                    <ShoppingCart className="h-6 w-6 text-[#1b1b18] dark:text-[#EDEDEC]" />
+                  </div>
                   <h3 className="mb-2 text-base font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                    Control de Inventario
+                    Punto de Venta
                   </h3>
                   <p className="text-[13px] leading-relaxed text-[#706f6c] dark:text-[#A1A09A]">
-                    Seguimiento en tiempo real de productos, alertas de stock bajo y gestión de proveedores.
+                    Registra ventas rápidamente con múltiples métodos de pago: efectivo, tarjeta, transferencia y crédito.
                   </p>
                 </div>
 
                 <div className="rounded-sm border border-[#19140035] p-6 dark:border-[#3E3E3A]">
-                  <div className="mb-3 text-2xl">💰</div>
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-[#1b1b18]/5 dark:bg-[#EDEDEC]/5">
+                    <Package className="h-6 w-6 text-[#1b1b18] dark:text-[#EDEDEC]" />
+                  </div>
                   <h3 className="mb-2 text-base font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                    Facturación Rápida
+                    Gestión de Productos
                   </h3>
                   <p className="text-[13px] leading-relaxed text-[#706f6c] dark:text-[#A1A09A]">
-                    Genera facturas profesionales en segundos. Compatible con tickets y comprobantes fiscales.
+                    Control de inventario con alertas de stock mínimo, códigos de producto y precios personalizados.
                   </p>
                 </div>
 
                 <div className="rounded-sm border border-[#19140035] p-6 dark:border-[#3E3E3A]">
-                  <div className="mb-3 text-2xl">📈</div>
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-[#1b1b18]/5 dark:bg-[#EDEDEC]/5">
+                    <FileText className="h-6 w-6 text-[#1b1b18] dark:text-[#EDEDEC]" />
+                  </div>
                   <h3 className="mb-2 text-base font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                    Reportes Detallados
+                    Facturación Electrónica
                   </h3>
                   <p className="text-[13px] leading-relaxed text-[#706f6c] dark:text-[#A1A09A]">
-                    Analiza ventas, ganancias y tendencias con reportes visuales y exportables.
+                    Genera facturas XML y PDF compatibles con formato DIAN para cumplir con requisitos fiscales.
                   </p>
                 </div>
 
                 <div className="rounded-sm border border-[#19140035] p-6 dark:border-[#3E3E3A]">
-                  <div className="mb-3 text-2xl">🔄</div>
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-[#1b1b18]/5 dark:bg-[#EDEDEC]/5">
+                    <BarChart3 className="h-6 w-6 text-[#1b1b18] dark:text-[#EDEDEC]" />
+                  </div>
                   <h3 className="mb-2 text-base font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                    Sincronización Cloud
+                    Contabilidad Integrada
                   </h3>
                   <p className="text-[13px] leading-relaxed text-[#706f6c] dark:text-[#A1A09A]">
-                    Accede a tus datos desde cualquier dispositivo. Tu información siempre segura.
+                    Plan de cuentas contable, asientos automáticos y estados financieros en tiempo real.
                   </p>
                 </div>
 
                 <div className="rounded-sm border border-[#19140035] p-6 dark:border-[#3E3E3A]">
-                  <div className="mb-3 text-2xl">👥</div>
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-[#1b1b18]/5 dark:bg-[#EDEDEC]/5">
+                    <TrendingUp className="h-6 w-6 text-[#1b1b18] dark:text-[#EDEDEC]" />
+                  </div>
                   <h3 className="mb-2 text-base font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                    Gestión de Clientes
+                    Reportes y Análisis
                   </h3>
                   <p className="text-[13px] leading-relaxed text-[#706f6c] dark:text-[#A1A09A]">
-                    Administra clientes, historial de compras y cuentas por cobrar de manera eficiente.
+                    Visualiza ventas por período, productos más vendidos, margen de utilidad y estado de resultados.
                   </p>
                 </div>
 
                 <div className="rounded-sm border border-[#19140035] p-6 dark:border-[#3E3E3A]">
-                  <div className="mb-3 text-2xl">⚡</div>
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-[#1b1b18]/5 dark:bg-[#EDEDEC]/5">
+                    <UserCog className="h-6 w-6 text-[#1b1b18] dark:text-[#EDEDEC]" />
+                  </div>
                   <h3 className="mb-2 text-base font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                    Interfaz Intuitiva
+                    Control de Usuarios
                   </h3>
                   <p className="text-[13px] leading-relaxed text-[#706f6c] dark:text-[#A1A09A]">
-                    Diseño simple y rápido de usar. Sin curvas de aprendizaje complicadas.
+                    Sistema de roles: administrador, contador y cajero. Cada usuario con permisos específicos.
                   </p>
                 </div>
               </div>

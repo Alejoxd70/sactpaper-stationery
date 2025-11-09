@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout'
 import { type BreadcrumbItem } from '@/types'
 import { Head, Link, router } from '@inertiajs/react'
 import { useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, AlertTriangle } from 'lucide-react'
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Ventas', href: '/sales' },
@@ -205,8 +205,9 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                     </button>
                   </div>
                   {hasStockError && (
-                    <p className="mt-1 text-xs text-red-500">
-                      ⚠️ Stock insuficiente. Disponible:
+                    <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
+                      <AlertTriangle className="h-3 w-3" />
+                      Stock insuficiente. Disponible:
                       {' '}
                       {selectedProduct.stock}
                     </p>
