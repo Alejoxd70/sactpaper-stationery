@@ -4,6 +4,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -63,6 +64,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('customers');
 
     Route::post('customers', [CustomerController::class, 'store'])->name('customers.store');
+
+    // Usuarios (solo admin)
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('users', [UserController::class, 'index'])->name('users');
+        Route::post('users', [UserController::class, 'store'])->name('users.store');
+        Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
 
     // Contabilidad
     Route::get('accounting', function () {

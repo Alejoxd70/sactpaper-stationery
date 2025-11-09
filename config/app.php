@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'SACTPAPER'),
 
     /*
     |--------------------------------------------------------------------------
@@ -134,7 +134,7 @@ return [
     */
 
     'company' => [
-        'name' => env('COMPANY_NAME', 'PAPELERÍA SACT'),
+        'name' => env('COMPANY_NAME', 'SACTPAPER'),
         'nit' => env('COMPANY_NIT', '900123456'),
         'address' => env('COMPANY_ADDRESS', 'Carrera 6 # 10-55'),
         'city' => env('COMPANY_CITY', 'CHÍA'),
