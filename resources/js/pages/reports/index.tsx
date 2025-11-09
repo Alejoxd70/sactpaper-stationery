@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { type BreadcrumbItem } from '@/types'
 import { Head } from '@inertiajs/react'
-import { TrendingUp, Package, AlertCircle } from 'lucide-react'
+import { TrendingUp, Package, AlertCircle, Download } from 'lucide-react'
 import { useState } from 'react'
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -43,6 +43,7 @@ interface ReportsData {
 export default function ReportsIndex({ data, startDate: initialStartDate, endDate: initialEndDate }: { data: ReportsData, startDate: string, endDate: string }) {
   const [startDate, setStartDate] = useState(initialStartDate)
   const [endDate, setEndDate] = useState(initialEndDate)
+  const today = new Date().toISOString().split('T')[0]
 
   const handleFilterChange = () => {
     if (startDate && endDate) {
@@ -71,30 +72,56 @@ export default function ReportsIndex({ data, startDate: initialStartDate, endDat
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Reportes" />
       <div className="flex h-full flex-1 flex-col gap-6 p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <h2 className="text-2xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">Reportes</h2>
-          <div className="flex gap-2">
-            <input
-              type="date"
-              value={startDate}
-              onChange={e => setStartDate(e.target.value)}
-              className="rounded-lg border border-sidebar-border/70 bg-white px-3 py-2 text-sm dark:border-sidebar-border dark:bg-[#161615] dark:text-[#EDEDEC]"
-              placeholder="Desde"
-            />
-            <input
-              type="date"
-              value={endDate}
-              onChange={e => setEndDate(e.target.value)}
-              className="rounded-lg border border-sidebar-border/70 bg-white px-3 py-2 text-sm dark:border-sidebar-border dark:bg-[#161615] dark:text-[#EDEDEC]"
-              placeholder="Hasta"
-            />
-            <button
-              onClick={handleFilterChange}
-              disabled={!startDate || !endDate}
-              className="rounded-lg bg-[#1b1b18] px-4 py-2 text-sm font-medium text-white hover:bg-[#2d2d28] disabled:opacity-50 disabled:cursor-not-allowed dark:bg-[#EDEDEC] dark:text-[#1b1b18] dark:hover:bg-[#d4d4d0]"
-            >
-              Filtrar
-            </button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#706f6c] dark:text-[#A1A09A] px-1">
+                Fecha Inicio
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                max={today}
+                onChange={e => setStartDate(e.target.value)}
+                className="w-full sm:w-auto rounded-lg border border-sidebar-border/70 bg-white px-3 py-2 text-sm dark:border-sidebar-border dark:bg-[#161615] dark:text-[#EDEDEC]"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#706f6c] dark:text-[#A1A09A] px-1">
+                Fecha Final
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                max={today}
+                onChange={e => setEndDate(e.target.value)}
+                className="w-full sm:w-auto rounded-lg border border-sidebar-border/70 bg-white px-3 py-2 text-sm dark:border-sidebar-border dark:bg-[#161615] dark:text-[#EDEDEC]"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-transparent px-1 select-none">
+                Acción
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleFilterChange}
+                  disabled={!startDate || !endDate}
+                  className="flex-1 sm:flex-none rounded-lg bg-[#1b1b18] px-4 py-2 text-sm font-medium text-white hover:bg-[#2d2d28] disabled:opacity-50 disabled:cursor-not-allowed dark:bg-[#EDEDEC] dark:text-[#1b1b18] dark:hover:bg-[#d4d4d0]"
+                >
+                  Filtrar
+                </button>
+                <a
+                  href={`/reports/pdf?start_date=${startDate}&end_date=${endDate}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 sm:flex-none rounded-lg border border-[#1b1b18] px-4 py-2 text-sm font-medium text-[#1b1b18] hover:bg-[#1b1b18] hover:text-white transition-colors dark:border-[#EDEDEC] dark:text-[#EDEDEC] dark:hover:bg-[#EDEDEC] dark:hover:text-[#1b1b18] text-center flex items-center justify-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  PDF
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 

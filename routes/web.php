@@ -93,8 +93,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Reportes
     Route::get('reports', function () {
-        $startDate = request('start_date', now()->startOfMonth()->format('Y-m-d'));
-        $endDate = request('end_date', now()->endOfDay()->format('Y-m-d'));
+        $startDate = request('start_date', now()->format('Y-m-d'));
+        $endDate = request('end_date', now()->format('Y-m-d'));
 
         // Ventas del período
         $sales = \App\Models\Invoice::whereBetween(DB::raw('DATE(date)'), [$startDate, $endDate])->get();
@@ -170,6 +170,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ],
         ]);
     })->name('reports');
+
+    // Generar PDF del reporte general
+    Route::get('reports/pdf', [ReportController::class, 'generatePdf'])->name('reports.pdf');
 });
 
 require __DIR__.'/settings.php';
