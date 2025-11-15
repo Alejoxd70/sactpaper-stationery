@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout'
 import { type BreadcrumbItem } from '@/types'
 import { Head, Link, router } from '@inertiajs/react'
 import { useState } from 'react'
-import { Plus, Trash2, AlertTriangle } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import InputError from '@/components/input-error'
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -89,7 +89,8 @@ export default function NewSale({ products, customers }: NewSaleProps) {
 
       if (!item.product_id) {
         newErrors[`item_${i}_product`] = 'Debe seleccionar un producto'
-      } else {
+      }
+      else {
         const product = products.find(p => p.id === parseInt(item.product_id))
         if (product && item.quantity > product.stock) {
           newErrors[`item_${i}_stock`] = `Stock insuficiente para ${product.name}. Disponible: ${product.stock}`
@@ -135,7 +136,7 @@ export default function NewSale({ products, customers }: NewSaleProps) {
               <label className="mb-2 block text-sm text-[#706f6c] dark:text-[#A1A09A]">Cliente</label>
               <select
                 value={customerId}
-                onChange={e => {
+                onChange={(e) => {
                   setCustomerId(e.target.value)
                   if (errors.customer_id) setErrors({ ...errors, customer_id: '' })
                 }}
@@ -199,7 +200,7 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                     <div className="flex-1">
                       <select
                         value={item.product_id}
-                        onChange={e => {
+                        onChange={(e) => {
                           updateItem(index, 'product_id', e.target.value)
                           const newErrors = { ...errors }
                           delete newErrors[`item_${index}_product`]
@@ -229,7 +230,7 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                       <input
                         type="number"
                         value={item.quantity}
-                        onChange={e => {
+                        onChange={(e) => {
                           updateItem(index, 'quantity', parseInt(e.target.value))
                           const newErrors = { ...errors }
                           delete newErrors[`item_${index}_quantity`]

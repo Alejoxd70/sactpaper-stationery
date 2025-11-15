@@ -72,20 +72,20 @@ export default function SalesIndex({ invoices, startDate: initialStartDate, endD
     }
   }
 
-  const getPaymentMethod = (method: string) => {
-    switch (method) {
-      case 'cash':
-        return 'Efectivo'
-      case 'card':
-        return 'Tarjeta'
-      case 'transfer':
-        return 'Transferencia'
-      case 'credit':
-        return 'Crédito'
-      default:
-        return method
-    }
-  }
+  // const getPaymentMethod = (method: string) => {
+  //   switch (method) {
+  //     case 'cash':
+  //       return 'Efectivo'
+  //     case 'card':
+  //       return 'Tarjeta'
+  //     case 'transfer':
+  //       return 'Transferencia'
+  //     case 'credit':
+  //       return 'Crédito'
+  //     default:
+  //       return method
+  //   }
+  // }
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -146,133 +146,133 @@ export default function SalesIndex({ invoices, startDate: initialStartDate, endD
         <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-white shadow-sm dark:border-sidebar-border dark:bg-[#161615]">
           {invoices.length === 0
             ? (
-              <div className="p-12 text-center">
-                <Receipt className="mx-auto mb-4 h-12 w-12 text-[#706f6c]" />
-                <p className="text-[#706f6c] dark:text-[#A1A09A]">No hay ventas registradas</p>
-                <Link
-                  href="/sales/new"
-                  className="mt-4 inline-block rounded-sm border border-[#19140035] px-4 py-2 text-sm text-[#1b1b18] hover:bg-[#fafaf9] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:bg-[#1f1f1e]"
-                >
-                  Registrar primera venta
-                </Link>
-              </div>
-            )
+                <div className="p-12 text-center">
+                  <Receipt className="mx-auto mb-4 h-12 w-12 text-[#706f6c]" />
+                  <p className="text-[#706f6c] dark:text-[#A1A09A]">No hay ventas registradas</p>
+                  <Link
+                    href="/sales/new"
+                    className="mt-4 inline-block rounded-sm border border-[#19140035] px-4 py-2 text-sm text-[#1b1b18] hover:bg-[#fafaf9] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:bg-[#1f1f1e]"
+                  >
+                    Registrar primera venta
+                  </Link>
+                </div>
+              )
             : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-[#1a1a19]">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
-                        Factura
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
-                        Cliente
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
-                        Fecha y Hora
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
-                        Items
-                      </th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
-                        Total
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
-                        Estado
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
-                        Acciones
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#19140035] dark:divide-[#3E3E3A]">
-                    {invoices.map(invoice => (
-                      <tr
-                        key={invoice.id}
-                        className="transition-colors hover:bg-gray-50/50 dark:hover:bg-[#1a1a19]/50"
-                      >
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <div className="rounded-md bg-blue-100 p-1.5 dark:bg-blue-900/30">
-                              <Receipt className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <span className="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                              {invoice.invoice_number}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="max-w-[200px]">
-                            <div className="truncate text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                              {invoice.customer.name}
-                            </div>
-                            <div className="text-xs text-[#706f6c] dark:text-[#A1A09A]">
-                              {invoice.customer.document_number}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="text-sm text-[#706f6c] dark:text-[#A1A09A]">
-                            {invoice.date.split(' ')[0].split('-').reverse().join('/')}
-                          </div>
-                          <div className="text-xs text-[#706f6c]/70 dark:text-[#A1A09A]/70">
-                            {invoice.date.split(' ')[1]?.substring(0, 5) || '--:--'}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <span className="inline-flex items-center justify-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                            {invoice.items.length}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <span className="text-sm font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
-                            $
-                            {parseFloat(invoice.total.toString()).toLocaleString('es-CO', { minimumFractionDigits: 0 })}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-center">
-                            <span
-                              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${invoice.payment_status === 'paid'
-                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                : invoice.payment_status === 'pending'
-                                  ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                                  : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                }`}
-                            >
-                              {getStatusIcon(invoice.payment_status)}
-                              {getStatusText(invoice.payment_status)}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <a
-                              href={`/sales/${invoice.id}/pdf`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 rounded-md border border-[#19140035] px-2.5 py-1.5 text-xs font-medium text-[#1b1b18] transition-colors hover:bg-[#fafaf9] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:bg-[#1f1f1e]"
-                              title="Descargar PDF"
-                            >
-                              <Printer className="h-3.5 w-3.5" />
-                            </a>
-                            <a
-                              href={`/sales/${invoice.id}/xml`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 rounded-md border border-[#19140035] px-2.5 py-1.5 text-xs font-medium text-[#1b1b18] transition-colors hover:bg-[#fafaf9] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:bg-[#1f1f1e]"
-                              title="Ver XML DIAN"
-                            >
-                              <FileText className="h-3.5 w-3.5" />
-                            </a>
-                          </div>
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 dark:bg-[#1a1a19]">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
+                          Factura
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
+                          Cliente
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
+                          Fecha y Hora
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
+                          Items
+                        </th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
+                          Total
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
+                          Estado
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
+                          Acciones
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    </thead>
+                    <tbody className="divide-y divide-[#19140035] dark:divide-[#3E3E3A]">
+                      {invoices.map(invoice => (
+                        <tr
+                          key={invoice.id}
+                          className="transition-colors hover:bg-gray-50/50 dark:hover:bg-[#1a1a19]/50"
+                        >
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <div className="rounded-md bg-blue-100 p-1.5 dark:bg-blue-900/30">
+                                <Receipt className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                              </div>
+                              <span className="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
+                                {invoice.invoice_number}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="max-w-[200px]">
+                              <div className="truncate text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
+                                {invoice.customer.name}
+                              </div>
+                              <div className="text-xs text-[#706f6c] dark:text-[#A1A09A]">
+                                {invoice.customer.document_number}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                              {invoice.date.split(' ')[0].split('-').reverse().join('/')}
+                            </div>
+                            <div className="text-xs text-[#706f6c]/70 dark:text-[#A1A09A]/70">
+                              {invoice.date.split(' ')[1]?.substring(0, 5) || '--:--'}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className="inline-flex items-center justify-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                              {invoice.items.length}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="text-sm font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                              $
+                              {parseFloat(invoice.total.toString()).toLocaleString('es-CO', { minimumFractionDigits: 0 })}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center justify-center">
+                              <span
+                                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${invoice.payment_status === 'paid'
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                  : invoice.payment_status === 'pending'
+                                    ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                                    : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                }`}
+                              >
+                                {getStatusIcon(invoice.payment_status)}
+                                {getStatusText(invoice.payment_status)}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center justify-center gap-1.5">
+                              <a
+                                href={`/sales/${invoice.id}/pdf`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 rounded-md border border-[#19140035] px-2.5 py-1.5 text-xs font-medium text-[#1b1b18] transition-colors hover:bg-[#fafaf9] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:bg-[#1f1f1e]"
+                                title="Descargar PDF"
+                              >
+                                <Printer className="h-3.5 w-3.5" />
+                              </a>
+                              <a
+                                href={`/sales/${invoice.id}/xml`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 rounded-md border border-[#19140035] px-2.5 py-1.5 text-xs font-medium text-[#1b1b18] transition-colors hover:bg-[#fafaf9] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:bg-[#1f1f1e]"
+                                title="Ver XML DIAN"
+                              >
+                                <FileText className="h-3.5 w-3.5" />
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
         </div>
       </div>
     </AppLayout>
