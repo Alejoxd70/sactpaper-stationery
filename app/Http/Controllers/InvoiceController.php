@@ -40,7 +40,7 @@ class InvoiceController extends Controller
                 'user_id' => Auth::id(),
                 'customer_id' => $request->customer_id,
                 'invoice_number' => 'INV-' . date('Ymd') . '-' . str_pad(Invoice::whereBetween(DB::raw('DATE(created_at)'), [today()->format('Y-m-d'), today()->format('Y-m-d')])->count() + 1, 4, '0', STR_PAD_LEFT),
-                'date' => $request->date,
+                'date' => now(),
                 'payment_method' => $request->payment_method,
                 'discount' => $request->discount ?? 0,
                 'payment_status' => $request->payment_method === 'credit' ? 'pending' : 'paid',
@@ -65,7 +65,7 @@ class InvoiceController extends Controller
                     'user_id' => Auth::id(),
                     'type' => 'sale',
                     'quantity' => $item['quantity'],
-                    'date' => $request->date,
+                    'date' => now(),
                     'notes' => "Venta - Factura {$invoice->invoice_number}",
                 ]);
             }
@@ -82,10 +82,19 @@ class InvoiceController extends Controller
 
     private function createAccountingEntry(Invoice $invoice)
     {
+        // Obtener cuentas por código (no por ID)
+        $cuentaCaja = \App\Models\Account::where('code', '1105')->first();
+        $cuentaClientes = \App\Models\Account::where('code', '1305')->first();
+        $cuentaIvaPorPagar = \App\Models\Account::where('code', '2367')->first();
+        $cuentaIngresoVentas = \App\Models\Account::where('code', '4135')->first();
+        $cuentaCostoVentas = \App\Models\Account::where('code', '6135')->first();
+        $cuentaInventario = \App\Models\Account::where('code', '1435')->first();
+
         // Débito: Caja o Clientes (si es crédito)
+        $cuentaDebito = $invoice->payment_method === 'credit' ? $cuentaClientes : $cuentaCaja;
         Transaction::create([
             'user_id' => Auth::id(),
-            'account_id' => $invoice->payment_method === 'credit' ? 5 : 3, // 1305 Clientes : 1105 Caja
+            'account_id' => $cuentaDebito->id,
             'invoice_id' => $invoice->id,
             'date' => $invoice->date,
             'description' => "Venta - Factura {$invoice->invoice_number}",
@@ -97,7 +106,7 @@ class InvoiceController extends Controller
         // Crédito: IVA por pagar
         Transaction::create([
             'user_id' => Auth::id(),
-            'account_id' => 11, // 2367 IVA por pagar
+            'account_id' => $cuentaIvaPorPagar->id,
             'invoice_id' => $invoice->id,
             'date' => $invoice->date,
             'description' => "IVA Venta - Factura {$invoice->invoice_number}",
@@ -109,7 +118,7 @@ class InvoiceController extends Controller
         // Crédito: Ingreso por ventas
         Transaction::create([
             'user_id' => Auth::id(),
-            'account_id' => 16, // 4135 Comercio
+            'account_id' => $cuentaIngresoVentas->id,
             'invoice_id' => $invoice->id,
             'date' => $invoice->date,
             'description' => "Venta - Factura {$invoice->invoice_number}",
@@ -123,7 +132,7 @@ class InvoiceController extends Controller
         
         Transaction::create([
             'user_id' => Auth::id(),
-            'account_id' => 23, // 6135 Costo mercancías
+            'account_id' => $cuentaCostoVentas->id,
             'invoice_id' => $invoice->id,
             'date' => $invoice->date,
             'description' => "Costo venta - Factura {$invoice->invoice_number}",
@@ -134,7 +143,7 @@ class InvoiceController extends Controller
 
         Transaction::create([
             'user_id' => Auth::id(),
-            'account_id' => 6, // 1435 Inventario
+            'account_id' => $cuentaInventario->id,
             'invoice_id' => $invoice->id,
             'date' => $invoice->date,
             'description' => "Salida inventario - Factura {$invoice->invoice_number}",

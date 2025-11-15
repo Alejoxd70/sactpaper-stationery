@@ -3,6 +3,7 @@ import { type BreadcrumbItem } from '@/types'
 import { Head, router } from '@inertiajs/react'
 import { useState } from 'react'
 import { Users, Plus, X, Mail, Phone, IdCard } from 'lucide-react'
+import InputError from '@/components/input-error'
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Clientes', href: '/customers' },
@@ -30,13 +31,40 @@ export default function CustomersIndex({ customers }: CustomersIndexProps) {
     email: '',
     phone: '',
   })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validación del frontend
+    const newErrors: Record<string, string> = {}
+
+    if (!form.name.trim()) {
+      newErrors.name = 'El nombre es requerido'
+    }
+
+    if (!form.document_number.trim()) {
+      newErrors.document_number = 'El número de documento es requerido'
+    }
+
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = 'El formato del email no es válido'
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
+    setErrors({})
     router.post('/customers', form, {
       onSuccess: () => {
         setShowForm(false)
         setForm({ name: '', document_type: 'CC', document_number: '', email: '', phone: '' })
+        setErrors({})
+      },
+      onError: (errors) => {
+        setErrors(errors as Record<string, string>)
       },
     })
   }
@@ -68,14 +96,19 @@ export default function CustomersIndex({ customers }: CustomersIndexProps) {
               Nuevo Cliente
             </h3>
             <div className="grid gap-4 md:grid-cols-3">
-              <input
-                type="text"
-                placeholder="Nombre completo"
-                value={form.name}
-                onChange={e => setForm({ ...form, name: e.target.value })}
-                className="rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-                required
-              />
+              <div>
+                <input
+                  type="text"
+                  placeholder="Nombre completo"
+                  value={form.name}
+                  onChange={e => {
+                    setForm({ ...form, name: e.target.value })
+                    if (errors.name) setErrors({ ...errors, name: '' })
+                  }}
+                  className={`w-full rounded-sm border ${errors.name ? 'border-red-500' : 'border-[#19140035]'} bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]`}
+                />
+                <InputError message={errors.name} />
+              </div>
               <select
                 value={form.document_type}
                 onChange={e => setForm({ ...form, document_type: e.target.value })}
@@ -86,24 +119,35 @@ export default function CustomersIndex({ customers }: CustomersIndexProps) {
                 <option value="CE">Cédula Extranjería</option>
                 <option value="TI">Tarjeta Identidad</option>
               </select>
-              <input
-                type="text"
-                placeholder="Número documento"
-                value={form.document_number}
-                onChange={e => setForm({ ...form, document_number: e.target.value })}
-                className="rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-                required
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={e => setForm({ ...form, email: e.target.value })}
-                className="rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-              />
+              <div>
+                <input
+                  type="text"
+                  placeholder="Número documento"
+                  value={form.document_number}
+                  onChange={e => {
+                    setForm({ ...form, document_number: e.target.value })
+                    if (errors.document_number) setErrors({ ...errors, document_number: '' })
+                  }}
+                  className={`w-full rounded-sm border ${errors.document_number ? 'border-red-500' : 'border-[#19140035]'} bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]`}
+                />
+                <InputError message={errors.document_number} />
+              </div>
+              <div>
+                <input
+                  type="email"
+                  placeholder="Email (opcional)"
+                  value={form.email}
+                  onChange={e => {
+                    setForm({ ...form, email: e.target.value })
+                    if (errors.email) setErrors({ ...errors, email: '' })
+                  }}
+                  className={`w-full rounded-sm border ${errors.email ? 'border-red-500' : 'border-[#19140035]'} bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]`}
+                />
+                <InputError message={errors.email} />
+              </div>
               <input
                 type="tel"
-                placeholder="Teléfono"
+                placeholder="Teléfono (opcional)"
                 value={form.phone}
                 onChange={e => setForm({ ...form, phone: e.target.value })}
                 className="rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"

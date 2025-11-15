@@ -2,6 +2,7 @@ import AppLayout from '@/layouts/app-layout'
 import { type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
 import { Receipt, CheckCircle, Clock, AlertCircle, FileText, Printer } from 'lucide-react'
+import React from 'react'
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Ventas', href: '/sales' },
@@ -31,9 +32,20 @@ interface Invoice {
 
 interface SalesIndexProps {
   invoices: Invoice[]
+  startDate: string
+  endDate: string
 }
 
-export default function SalesIndex({ invoices }: SalesIndexProps) {
+export default function SalesIndex({ invoices, startDate: initialStartDate, endDate: initialEndDate }: SalesIndexProps) {
+  const [startDate, setStartDate] = React.useState(initialStartDate)
+  const [endDate, setEndDate] = React.useState(initialEndDate)
+  const today = new Date().toISOString().split('T')[0]
+
+  const handleFilterChange = () => {
+    if (startDate && endDate) {
+      window.location.href = `/sales?start_date=${startDate}&end_date=${endDate}`
+    }
+  }
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'paid':
@@ -60,39 +72,75 @@ export default function SalesIndex({ invoices }: SalesIndexProps) {
     }
   }
 
-  const getPaymentMethod = (method: string) => {
-    switch (method) {
-      case 'cash':
-        return 'Efectivo'
-      case 'card':
-        return 'Tarjeta'
-      case 'transfer':
-        return 'Transferencia'
-      case 'credit':
-        return 'Crédito'
-      default:
-        return method
-    }
-  }
+  // const getPaymentMethod = (method: string) => {
+  //   switch (method) {
+  //     case 'cash':
+  //       return 'Efectivo'
+  //     case 'card':
+  //       return 'Tarjeta'
+  //     case 'transfer':
+  //       return 'Transferencia'
+  //     case 'credit':
+  //       return 'Crédito'
+  //     default:
+  //       return method
+  //   }
+  // }
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Ventas" />
       <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-[#1b1b18] dark:text-[#EDEDEC]">Ventas</h2>
-            <p className="mt-1 text-sm text-[#706f6c] dark:text-[#A1A09A]">
-              Gestiona tus facturas y ventas
-            </p>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-[#1b1b18] dark:text-[#EDEDEC]">Ventas</h2>
+              <p className="mt-1 text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                Gestiona tus facturas y ventas
+              </p>
+            </div>
+            <Link
+              href="/sales/new"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#1b1b18] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#2d2d28] hover:shadow-md dark:bg-[#EDEDEC] dark:text-[#1b1b18] dark:hover:bg-[#d5d5d0]"
+            >
+              <Receipt className="h-4 w-4" />
+              Nueva Venta
+            </Link>
           </div>
-          <Link
-            href="/sales/new"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#1b1b18] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#2d2d28] hover:shadow-md dark:bg-[#EDEDEC] dark:text-[#1b1b18] dark:hover:bg-[#d5d5d0]"
-          >
-            <Receipt className="h-4 w-4" />
-            Nueva Venta
-          </Link>
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#706f6c] dark:text-[#A1A09A] px-1">
+                Fecha Inicio
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                max={today}
+                onChange={e => setStartDate(e.target.value)}
+                className="w-full sm:w-auto rounded-lg border border-sidebar-border/70 bg-white px-3 py-2 text-sm dark:border-sidebar-border dark:bg-[#161615] dark:text-[#EDEDEC]"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[#706f6c] dark:text-[#A1A09A] px-1">
+                Fecha Final
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                max={today}
+                onChange={e => setEndDate(e.target.value)}
+                className="w-full sm:w-auto rounded-lg border border-sidebar-border/70 bg-white px-3 py-2 text-sm dark:border-sidebar-border dark:bg-[#161615] dark:text-[#EDEDEC]"
+              />
+            </div>
+            <button
+              onClick={handleFilterChange}
+              disabled={!startDate || !endDate}
+              className="rounded-lg bg-[#1b1b18] px-4 py-2 text-sm font-medium text-white hover:bg-[#2d2d28] disabled:opacity-50 disabled:cursor-not-allowed dark:bg-[#EDEDEC] dark:text-[#1b1b18] dark:hover:bg-[#d4d4d0]"
+            >
+              Filtrar
+            </button>
+          </div>
         </div>
 
         <div className="overflow-hidden rounded-lg border border-sidebar-border/70 bg-white shadow-sm dark:border-sidebar-border dark:bg-[#161615]">
@@ -121,7 +169,7 @@ export default function SalesIndex({ invoices }: SalesIndexProps) {
                           Cliente
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
-                          Fecha
+                          Fecha y Hora
                         </th>
                         <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[#706f6c] dark:text-[#A1A09A]">
                           Items
@@ -165,10 +213,10 @@ export default function SalesIndex({ invoices }: SalesIndexProps) {
                           </td>
                           <td className="px-4 py-3">
                             <div className="text-sm text-[#706f6c] dark:text-[#A1A09A]">
-                              {invoice.date.split('T')[0].split('-').reverse().join('/')}
+                              {invoice.date.split(' ')[0].split('-').reverse().join('/')}
                             </div>
                             <div className="text-xs text-[#706f6c]/70 dark:text-[#A1A09A]/70">
-                              {getPaymentMethod(invoice.payment_method)}
+                              {invoice.date.split(' ')[1]?.substring(0, 5) || '--:--'}
                             </div>
                           </td>
                           <td className="px-4 py-3 text-center">

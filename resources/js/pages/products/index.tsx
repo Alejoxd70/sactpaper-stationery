@@ -3,6 +3,7 @@ import { type BreadcrumbItem } from '@/types'
 import { Head, router } from '@inertiajs/react'
 import { useState } from 'react'
 import { Package, Edit2, Trash2, Save, X, Plus, AlertTriangle } from 'lucide-react'
+import InputError from '@/components/input-error'
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Productos', href: '/products' },
@@ -34,13 +35,48 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
     min_stock: '5',
   })
   const [editForm, setEditForm] = useState<Product | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validación del frontend
+    const newErrors: Record<string, string> = {}
+
+    if (!form.code.trim()) {
+      newErrors.code = 'El código es requerido'
+    }
+
+    if (!form.name.trim()) {
+      newErrors.name = 'El nombre es requerido'
+    }
+
+    if (!form.unit_price || parseFloat(form.unit_price) <= 0) {
+      newErrors.unit_price = 'El precio de venta debe ser mayor a 0'
+    }
+
+    if (!form.cost || parseFloat(form.cost) < 0) {
+      newErrors.cost = 'El costo debe ser mayor o igual a 0'
+    }
+
+    if (!form.stock || parseInt(form.stock) < 0) {
+      newErrors.stock = 'El stock debe ser mayor o igual a 0'
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
+    setErrors({})
     router.post('/products', form, {
       onSuccess: () => {
         setShowForm(false)
         setForm({ code: '', name: '', unit_price: '', cost: '', stock: '', min_stock: '5' })
+        setErrors({})
+      },
+      onError: (errors) => {
+        setErrors(errors as Record<string, string>)
       },
     })
   }
@@ -111,10 +147,13 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
                   type="text"
                   placeholder="COD-001"
                   value={form.code}
-                  onChange={e => setForm({ ...form, code: e.target.value })}
-                  className="w-full rounded-md border border-[#19140035] bg-white px-3 py-2 text-sm text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20"
-                  required
+                  onChange={e => {
+                    setForm({ ...form, code: e.target.value })
+                    if (errors.code) setErrors({ ...errors, code: '' })
+                  }}
+                  className={`w-full rounded-md border ${errors.code ? 'border-red-500' : 'border-[#19140035]'} bg-white px-3 py-2 text-sm text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20`}
                 />
+                <InputError message={errors.code} />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-[#706f6c] dark:text-[#A1A09A]">Nombre</label>
@@ -122,10 +161,13 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
                   type="text"
                   placeholder="Nombre del producto"
                   value={form.name}
-                  onChange={e => setForm({ ...form, name: e.target.value })}
-                  className="w-full rounded-md border border-[#19140035] bg-white px-3 py-2 text-sm text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20"
-                  required
+                  onChange={e => {
+                    setForm({ ...form, name: e.target.value })
+                    if (errors.name) setErrors({ ...errors, name: '' })
+                  }}
+                  className={`w-full rounded-md border ${errors.name ? 'border-red-500' : 'border-[#19140035]'} bg-white px-3 py-2 text-sm text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20`}
                 />
+                <InputError message={errors.name} />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-[#706f6c] dark:text-[#A1A09A]">Precio Venta</label>
@@ -133,11 +175,14 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
                   type="number"
                   placeholder="0"
                   value={form.unit_price}
-                  onChange={e => setForm({ ...form, unit_price: e.target.value })}
-                  className="w-full rounded-md border border-[#19140035] bg-white px-3 py-2 text-sm text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20"
+                  onChange={e => {
+                    setForm({ ...form, unit_price: e.target.value })
+                    if (errors.unit_price) setErrors({ ...errors, unit_price: '' })
+                  }}
+                  className={`w-full rounded-md border ${errors.unit_price ? 'border-red-500' : 'border-[#19140035]'} bg-white px-3 py-2 text-sm text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20`}
                   step="0.01"
-                  required
                 />
+                <InputError message={errors.unit_price} />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-[#706f6c] dark:text-[#A1A09A]">Costo</label>
@@ -145,11 +190,14 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
                   type="number"
                   placeholder="0"
                   value={form.cost}
-                  onChange={e => setForm({ ...form, cost: e.target.value })}
-                  className="w-full rounded-md border border-[#19140035] bg-white px-3 py-2 text-sm text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20"
+                  onChange={e => {
+                    setForm({ ...form, cost: e.target.value })
+                    if (errors.cost) setErrors({ ...errors, cost: '' })
+                  }}
+                  className={`w-full rounded-md border ${errors.cost ? 'border-red-500' : 'border-[#19140035]'} bg-white px-3 py-2 text-sm text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20`}
                   step="0.01"
-                  required
                 />
+                <InputError message={errors.cost} />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-[#706f6c] dark:text-[#A1A09A]">Stock Inicial</label>
@@ -157,10 +205,13 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
                   type="number"
                   placeholder="0"
                   value={form.stock}
-                  onChange={e => setForm({ ...form, stock: e.target.value })}
-                  className="w-full rounded-md border border-[#19140035] bg-white px-3 py-2 text-sm text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20"
-                  required
+                  onChange={e => {
+                    setForm({ ...form, stock: e.target.value })
+                    if (errors.stock) setErrors({ ...errors, stock: '' })
+                  }}
+                  className={`w-full rounded-md border ${errors.stock ? 'border-red-500' : 'border-[#19140035]'} bg-white px-3 py-2 text-sm text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20`}
                 />
+                <InputError message={errors.stock} />
               </div>
               <div className="flex items-end">
                 <button
@@ -207,129 +258,129 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
                   >
                     {editingId === product.id
                       ? (
-                          <>
-                            <td className="p-4">
-                              <input
-                                type="text"
-                                value={editForm?.code || ''}
-                                onChange={e => setEditForm(prev => prev ? { ...prev, code: e.target.value } : null)}
-                                className="w-full rounded-sm border border-[#19140035] bg-white px-2 py-1 text-sm text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-                              />
-                            </td>
-                            <td className="p-4">
-                              <input
-                                type="text"
-                                value={editForm?.name || ''}
-                                onChange={e => setEditForm(prev => prev ? { ...prev, name: e.target.value } : null)}
-                                className="w-full rounded-sm border border-[#19140035] bg-white px-2 py-1 text-sm text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-                              />
-                            </td>
-                            <td className="p-4">
-                              <input
-                                type="number"
-                                value={editForm?.cost || ''}
-                                onChange={e => setEditForm(prev => prev ? { ...prev, cost: parseFloat(e.target.value) } : null)}
-                                className="w-full rounded-sm border border-[#19140035] bg-white px-2 py-1 text-sm text-right text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-                                step="0.01"
-                              />
-                            </td>
-                            <td className="p-4">
-                              <input
-                                type="number"
-                                value={editForm?.unit_price || ''}
-                                onChange={e => setEditForm(prev => prev ? { ...prev, unit_price: parseFloat(e.target.value) } : null)}
-                                className="w-full rounded-sm border border-[#19140035] bg-white px-2 py-1 text-sm text-right text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-                                step="0.01"
-                              />
-                            </td>
-                            <td className="p-4">
-                              <input
-                                type="number"
-                                value={editForm?.stock || ''}
-                                onChange={e => setEditForm(prev => prev ? { ...prev, stock: parseInt(e.target.value) } : null)}
-                                className="w-full rounded-sm border border-[#19140035] bg-white px-2 py-1 text-sm text-right text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-                              />
-                            </td>
-                            <td className="p-4">
-                              <div className="flex justify-end gap-2">
-                                <button
-                                  onClick={() => handleUpdate(product.id)}
-                                  className="rounded-sm bg-green-500 p-2 text-white hover:bg-green-600"
-                                >
-                                  <Save className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={handleCancel}
-                                  className="rounded-sm bg-gray-500 p-2 text-white hover:bg-gray-600"
-                                >
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </td>
-                          </>
-                        )
+                        <>
+                          <td className="p-4">
+                            <input
+                              type="text"
+                              value={editForm?.code || ''}
+                              onChange={e => setEditForm(prev => prev ? { ...prev, code: e.target.value } : null)}
+                              className="w-full rounded-sm border border-[#19140035] bg-white px-2 py-1 text-sm text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
+                            />
+                          </td>
+                          <td className="p-4">
+                            <input
+                              type="text"
+                              value={editForm?.name || ''}
+                              onChange={e => setEditForm(prev => prev ? { ...prev, name: e.target.value } : null)}
+                              className="w-full rounded-sm border border-[#19140035] bg-white px-2 py-1 text-sm text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
+                            />
+                          </td>
+                          <td className="p-4">
+                            <input
+                              type="number"
+                              value={editForm?.cost || ''}
+                              onChange={e => setEditForm(prev => prev ? { ...prev, cost: parseFloat(e.target.value) } : null)}
+                              className="w-full rounded-sm border border-[#19140035] bg-white px-2 py-1 text-sm text-right text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
+                              step="0.01"
+                            />
+                          </td>
+                          <td className="p-4">
+                            <input
+                              type="number"
+                              value={editForm?.unit_price || ''}
+                              onChange={e => setEditForm(prev => prev ? { ...prev, unit_price: parseFloat(e.target.value) } : null)}
+                              className="w-full rounded-sm border border-[#19140035] bg-white px-2 py-1 text-sm text-right text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
+                              step="0.01"
+                            />
+                          </td>
+                          <td className="p-4">
+                            <input
+                              type="number"
+                              value={editForm?.stock || ''}
+                              onChange={e => setEditForm(prev => prev ? { ...prev, stock: parseInt(e.target.value) } : null)}
+                              className="w-full rounded-sm border border-[#19140035] bg-white px-2 py-1 text-sm text-right text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
+                            />
+                          </td>
+                          <td className="p-4">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => handleUpdate(product.id)}
+                                className="rounded-sm bg-green-500 p-2 text-white hover:bg-green-600"
+                              >
+                                <Save className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={handleCancel}
+                                className="rounded-sm bg-gray-500 p-2 text-white hover:bg-gray-600"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      )
                       : (
-                          <>
-                            <td className="px-4 py-3">
-                              <span className="inline-flex items-center gap-2 rounded-md bg-gray-100 px-2.5 py-1 text-xs font-mono font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                                {product.code}
+                        <>
+                          <td className="px-4 py-3">
+                            <span className="inline-flex items-center gap-2 rounded-md bg-gray-100 px-2.5 py-1 text-xs font-mono font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                              {product.code}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <div className="rounded-md bg-blue-100 p-1.5 dark:bg-blue-900/30">
+                                <Package className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                              </div>
+                              <span className="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
+                                {product.name}
                               </span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <div className="rounded-md bg-blue-100 p-1.5 dark:bg-blue-900/30">
-                                  <Package className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                                </div>
-                                <span className="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                                  {product.name}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                              $
+                              {product.cost.toLocaleString('es-CO')}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="text-sm font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                              $
+                              {product.unit_price.toLocaleString('es-CO')}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <span className="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
+                                {product.stock}
+                              </span>
+                              {product.stock <= product.min_stock && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                  <AlertTriangle className="h-3 w-3" />
+                                  Bajo
                                 </span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <span className="text-sm text-[#706f6c] dark:text-[#A1A09A]">
-                                $
-                                {product.cost.toLocaleString('es-CO')}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <span className="text-sm font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
-                                $
-                                {product.unit_price.toLocaleString('es-CO')}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                <span className="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                                  {product.stock}
-                                </span>
-                                {product.stock <= product.min_stock && (
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                                    <AlertTriangle className="h-3 w-3" />
-                                    Bajo
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center justify-center gap-1.5">
-                                <button
-                                  onClick={() => handleEdit(product)}
-                                  className="inline-flex items-center gap-1 rounded-md bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-                                  title="Editar"
-                                >
-                                  <Edit2 className="h-3.5 w-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(product.id)}
-                                  className="inline-flex items-center gap-1 rounded-md bg-red-500 p-2 text-white transition-colors hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
-                                  title="Eliminar"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </button>
-                              </div>
-                            </td>
-                          </>
-                        )}
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center justify-center gap-1.5">
+                              <button
+                                onClick={() => handleEdit(product)}
+                                className="inline-flex items-center gap-1 rounded-md bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                                title="Editar"
+                              >
+                                <Edit2 className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(product.id)}
+                                className="inline-flex items-center gap-1 rounded-md bg-red-500 p-2 text-white transition-colors hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+                                title="Eliminar"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      )}
                   </tr>
                 ))}
               </tbody>

@@ -2,7 +2,8 @@ import AppLayout from '@/layouts/app-layout'
 import { type BreadcrumbItem } from '@/types'
 import { Head, Link, router } from '@inertiajs/react'
 import { useState } from 'react'
-import { Plus, Trash2, AlertTriangle } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
+import InputError from '@/components/input-error'
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Ventas', href: '/sales' },
@@ -32,6 +33,7 @@ export default function NewSale({ products, customers }: NewSaleProps) {
   const [customerId, setCustomerId] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('cash')
   const [items, setItems] = useState<Array<{ product_id: string, quantity: number, unit_price: number }>>([])
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const addItem = () => {
     setItems([...items, { product_id: '', quantity: 1, unit_price: 0 }])
@@ -70,15 +72,42 @@ export default function NewSale({ products, customers }: NewSaleProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validar stock antes de enviar
-    for (const item of items) {
-      const product = products.find(p => p.id === parseInt(item.product_id))
-      if (product && item.quantity > product.stock) {
-        alert(`Stock insuficiente para ${product.name}.\nDisponible: ${product.stock}\nSolicitado: ${item.quantity}`)
-        return
+    // Validación del frontend
+    const newErrors: Record<string, string> = {}
+
+    if (!customerId) {
+      newErrors.customer_id = 'Debe seleccionar un cliente'
+    }
+
+    if (items.length === 0) {
+      newErrors.items = 'Debe agregar al menos un producto a la venta'
+    }
+
+    // Validar que todos los productos tengan datos completos y stock
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+
+      if (!item.product_id) {
+        newErrors[`item_${i}_product`] = 'Debe seleccionar un producto'
+      }
+      else {
+        const product = products.find(p => p.id === parseInt(item.product_id))
+        if (product && item.quantity > product.stock) {
+          newErrors[`item_${i}_stock`] = `Stock insuficiente para ${product.name}. Disponible: ${product.stock}`
+        }
+      }
+
+      if (item.quantity <= 0) {
+        newErrors[`item_${i}_quantity`] = 'La cantidad debe ser mayor a 0'
       }
     }
 
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
+    setErrors({})
     router.post('/sales', {
       customer_id: customerId,
       date: new Date().toISOString().split('T')[0],
@@ -88,6 +117,10 @@ export default function NewSale({ products, customers }: NewSaleProps) {
         quantity: item.quantity,
         unit_price: item.unit_price,
       })),
+    }, {
+      onError: (errors) => {
+        setErrors(errors as Record<string, string>)
+      },
     })
   }
 
@@ -103,9 +136,11 @@ export default function NewSale({ products, customers }: NewSaleProps) {
               <label className="mb-2 block text-sm text-[#706f6c] dark:text-[#A1A09A]">Cliente</label>
               <select
                 value={customerId}
-                onChange={e => setCustomerId(e.target.value)}
-                className="w-full rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-                required
+                onChange={(e) => {
+                  setCustomerId(e.target.value)
+                  if (errors.customer_id) setErrors({ ...errors, customer_id: '' })
+                }}
+                className={`w-full rounded-sm border ${errors.customer_id ? 'border-red-500' : 'border-[#19140035]'} bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]`}
               >
                 <option value="">Seleccionar cliente</option>
                 {customers.map(c => (
@@ -118,6 +153,7 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                   </option>
                 ))}
               </select>
+              <InputError message={errors.customer_id} />
             </div>
 
             <div>
@@ -130,7 +166,6 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                 <option value="cash">Efectivo</option>
                 <option value="card">Tarjeta</option>
                 <option value="transfer">Transferencia</option>
-                <option value="credit">Crédito</option>
               </select>
             </div>
           </div>
@@ -140,52 +175,73 @@ export default function NewSale({ products, customers }: NewSaleProps) {
               <h3 className="text-lg font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">Productos</h3>
               <button
                 type="button"
-                onClick={addItem}
+                onClick={() => {
+                  addItem()
+                  if (errors.items) setErrors({ ...errors, items: '' })
+                }}
                 className="rounded-sm border border-[#1b1b18] bg-[#1b1b18] px-4 py-2 text-sm text-white hover:bg-[#2d2d28] dark:border-[#EDEDEC] dark:bg-[#EDEDEC] dark:text-[#1b1b18]"
               >
                 <Plus className="mr-2 inline h-4 w-4" />
                 Agregar Producto
               </button>
             </div>
+            <InputError message={errors.items} className="mb-3" />
 
             {items.map((item, index) => {
               const selectedProduct = products.find(p => p.id === parseInt(item.product_id))
               const hasStockError = selectedProduct && item.quantity > selectedProduct.stock
+              const itemProductError = errors[`item_${index}_product`]
+              const itemStockError = errors[`item_${index}_stock`]
+              const itemQuantityError = errors[`item_${index}_quantity`]
 
               return (
                 <div key={index} className="mb-3">
                   <div className="flex gap-3">
-                    <select
-                      value={item.product_id}
-                      onChange={e => updateItem(index, 'product_id', e.target.value)}
-                      className="flex-1 rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-                      required
-                    >
-                      <option value="">Seleccionar producto</option>
-                      {products.map(p => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
-                          {' '}
-                          - $
-                          {p.unit_price}
-                          {' '}
-                          (Stock:
-                          {' '}
-                          {p.stock}
-                          )
-                        </option>
-                      ))}
-                    </select>
+                    <div className="flex-1">
+                      <select
+                        value={item.product_id}
+                        onChange={(e) => {
+                          updateItem(index, 'product_id', e.target.value)
+                          const newErrors = { ...errors }
+                          delete newErrors[`item_${index}_product`]
+                          delete newErrors[`item_${index}_stock`]
+                          setErrors(newErrors)
+                        }}
+                        className={`w-full rounded-sm border ${itemProductError || itemStockError ? 'border-red-500' : 'border-[#19140035]'} bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]`}
+                      >
+                        <option value="">Seleccionar producto</option>
+                        {products.map(p => (
+                          <option key={p.id} value={p.id}>
+                            {p.name}
+                            {' '}
+                            - $
+                            {p.unit_price}
+                            {' '}
+                            (Stock:
+                            {' '}
+                            {p.stock}
+                            )
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                    <input
-                      type="number"
-                      value={item.quantity}
-                      onChange={e => updateItem(index, 'quantity', parseInt(e.target.value))}
-                      className={`w-24 rounded-sm border px-4 py-2 ${hasStockError ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-[#19140035] bg-white dark:border-[#3E3E3A] dark:bg-[#161615]'} text-[#1b1b18] dark:text-[#EDEDEC]`}
-                      min="1"
-                      max={selectedProduct?.stock || undefined}
-                      required
-                    />
+                    <div>
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) => {
+                          updateItem(index, 'quantity', parseInt(e.target.value))
+                          const newErrors = { ...errors }
+                          delete newErrors[`item_${index}_quantity`]
+                          delete newErrors[`item_${index}_stock`]
+                          setErrors(newErrors)
+                        }}
+                        className={`w-24 rounded-sm border px-4 py-2 ${hasStockError || itemQuantityError || itemStockError ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-[#19140035] bg-white dark:border-[#3E3E3A] dark:bg-[#161615]'} text-[#1b1b18] dark:text-[#EDEDEC]`}
+                        min="1"
+                        max={selectedProduct?.stock || undefined}
+                      />
+                    </div>
 
                     <input
                       type="number"
@@ -193,7 +249,6 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                       onChange={e => updateItem(index, 'unit_price', parseFloat(e.target.value))}
                       className="w-32 rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
                       step="0.01"
-                      required
                     />
 
                     <button
@@ -204,14 +259,11 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-                  {hasStockError && (
-                    <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
-                      <AlertTriangle className="h-3 w-3" />
-                      Stock insuficiente. Disponible:
-                      {' '}
-                      {selectedProduct.stock}
-                    </p>
+                  {(hasStockError || itemStockError) && (
+                    <InputError message={itemStockError || `Stock insuficiente. Disponible: ${selectedProduct?.stock}`} className="mt-1" />
                   )}
+                  {itemProductError && <InputError message={itemProductError} className="mt-1" />}
+                  {itemQuantityError && <InputError message={itemQuantityError} className="mt-1" />}
                 </div>
               )
             })}

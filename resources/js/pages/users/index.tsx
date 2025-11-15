@@ -3,6 +3,7 @@ import { type BreadcrumbItem, type User } from '@/types'
 import { Head, router } from '@inertiajs/react'
 import { useState } from 'react'
 import { UserCog, Edit2, Trash2, Save, X, Plus, Shield, Eye, EyeOff } from 'lucide-react'
+import InputError from '@/components/input-error'
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Usuarios', href: '/users' },
@@ -37,6 +38,7 @@ export default function UsersIndex({ users }: UsersIndexProps) {
     is_active: true,
   })
   const [editForm, setEditForm] = useState<User & { password?: string, password_confirmation?: string } | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const roleLabels = {
     admin: 'Administrador',
@@ -46,10 +48,44 @@ export default function UsersIndex({ users }: UsersIndexProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validación del frontend
+    const newErrors: Record<string, string> = {}
+
+    if (!form.name.trim()) {
+      newErrors.name = 'El nombre es requerido'
+    }
+
+    if (!form.email.trim()) {
+      newErrors.email = 'El email es requerido'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = 'El formato del email no es válido'
+    }
+
+    if (!form.password) {
+      newErrors.password = 'La contraseña es requerida'
+    } else if (form.password.length < 8) {
+      newErrors.password = 'La contraseña debe tener al menos 8 caracteres'
+    }
+
+    if (form.password !== form.password_confirmation) {
+      newErrors.password_confirmation = 'Las contraseñas no coinciden'
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
+    setErrors({})
     router.post('/users', form, {
       onSuccess: () => {
         setShowForm(false)
         setForm({ name: '', email: '', password: '', password_confirmation: '', role: 'cashier', is_active: true })
+        setErrors({})
+      },
+      onError: (errors) => {
+        setErrors(errors as Record<string, string>)
       },
     })
   }
@@ -125,11 +161,14 @@ export default function UsersIndex({ users }: UsersIndexProps) {
                 </label>
                 <input
                   type="text"
-                  required
                   value={form.name}
-                  onChange={e => setForm({ ...form, name: e.target.value })}
-                  className="w-full rounded-lg border border-[#DDDDD8] bg-white px-4 py-2.5 text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20"
+                  onChange={e => {
+                    setForm({ ...form, name: e.target.value })
+                    if (errors.name) setErrors({ ...errors, name: '' })
+                  }}
+                  className={`w-full rounded-lg border ${errors.name ? 'border-red-500' : 'border-[#DDDDD8]'} bg-white px-4 py-2.5 text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20`}
                 />
+                <InputError message={errors.name} />
               </div>
 
               <div>
@@ -138,11 +177,14 @@ export default function UsersIndex({ users }: UsersIndexProps) {
                 </label>
                 <input
                   type="email"
-                  required
                   value={form.email}
-                  onChange={e => setForm({ ...form, email: e.target.value })}
-                  className="w-full rounded-lg border border-[#DDDDD8] bg-white px-4 py-2.5 text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20"
+                  onChange={e => {
+                    setForm({ ...form, email: e.target.value })
+                    if (errors.email) setErrors({ ...errors, email: '' })
+                  }}
+                  className={`w-full rounded-lg border ${errors.email ? 'border-red-500' : 'border-[#DDDDD8]'} bg-white px-4 py-2.5 text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20`}
                 />
+                <InputError message={errors.email} />
               </div>
 
               <div>
@@ -168,11 +210,13 @@ export default function UsersIndex({ users }: UsersIndexProps) {
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    required
                     minLength={8}
                     value={form.password}
-                    onChange={e => setForm({ ...form, password: e.target.value })}
-                    className="w-full rounded-lg border border-[#DDDDD8] bg-white px-4 py-2.5 pr-10 text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20"
+                    onChange={e => {
+                      setForm({ ...form, password: e.target.value })
+                      if (errors.password) setErrors({ ...errors, password: '' })
+                    }}
+                    className={`w-full rounded-lg border ${errors.password ? 'border-red-500' : 'border-[#DDDDD8]'} bg-white px-4 py-2.5 pr-10 text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20`}
                   />
                   <button
                     type="button"
@@ -182,6 +226,7 @@ export default function UsersIndex({ users }: UsersIndexProps) {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                <InputError message={errors.password} />
               </div>
 
               <div>
@@ -190,12 +235,15 @@ export default function UsersIndex({ users }: UsersIndexProps) {
                 </label>
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  required
                   minLength={8}
                   value={form.password_confirmation}
-                  onChange={e => setForm({ ...form, password_confirmation: e.target.value })}
-                  className="w-full rounded-lg border border-[#DDDDD8] bg-white px-4 py-2.5 text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20"
+                  onChange={e => {
+                    setForm({ ...form, password_confirmation: e.target.value })
+                    if (errors.password_confirmation) setErrors({ ...errors, password_confirmation: '' })
+                  }}
+                  className={`w-full rounded-lg border ${errors.password_confirmation ? 'border-red-500' : 'border-[#DDDDD8]'} bg-white px-4 py-2.5 text-[#1b1b18] transition-colors focus:border-[#1b1b18] focus:outline-none focus:ring-2 focus:ring-[#1b1b18]/20 dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]/20`}
                 />
+                <InputError message={errors.password_confirmation} />
               </div>
 
               <div className="flex items-center gap-2">
@@ -254,121 +302,121 @@ export default function UsersIndex({ users }: UsersIndexProps) {
                   <tr key={user.id} className="transition-colors hover:bg-[#F5F5F0] dark:hover:bg-[#2d2d28]">
                     {editingId === user.id && editForm
                       ? (
-                          <>
-                            <td className="px-6 py-4">
-                              <div className="flex flex-col gap-2">
-                                <input
-                                  type="text"
-                                  value={editForm.name}
-                                  onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                                  className="rounded border border-[#DDDDD8] px-2 py-1 text-sm dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC]"
-                                />
-                                <input
-                                  type="email"
-                                  value={editForm.email}
-                                  onChange={e => setEditForm({ ...editForm, email: e.target.value })}
-                                  className="rounded border border-[#DDDDD8] px-2 py-1 text-sm dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC]"
-                                />
-                                <input
-                                  type="password"
-                                  placeholder="Nueva contraseña (opcional)"
-                                  value={editForm.password || ''}
-                                  onChange={e => setEditForm({ ...editForm, password: e.target.value })}
-                                  className="rounded border border-[#DDDDD8] px-2 py-1 text-sm dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC]"
-                                />
-                                <input
-                                  type="password"
-                                  placeholder="Confirmar contraseña"
-                                  value={editForm.password_confirmation || ''}
-                                  onChange={e => setEditForm({ ...editForm, password_confirmation: e.target.value })}
-                                  className="rounded border border-[#DDDDD8] px-2 py-1 text-sm dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC]"
-                                />
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <select
-                                value={editForm.role}
-                                onChange={e => setEditForm({ ...editForm, role: e.target.value as UserRole })}
-                                className="rounded border border-[#DDDDD8] px-2 py-1 text-sm dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC]"
-                              >
-                                <option value="cashier">Cajero/a</option>
-                                <option value="accountant">Contador/a</option>
-                                <option value="admin">Administrador</option>
-                              </select>
-                            </td>
-                            <td className="px-6 py-4">
+                        <>
+                          <td className="px-6 py-4">
+                            <div className="flex flex-col gap-2">
                               <input
-                                type="checkbox"
-                                checked={editForm.is_active}
-                                onChange={e => setEditForm({ ...editForm, is_active: e.target.checked })}
-                                className="h-4 w-4 rounded border-[#DDDDD8] dark:border-[#2d2d28] dark:bg-[#0f0f0e]"
+                                type="text"
+                                value={editForm.name}
+                                onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                                className="rounded border border-[#DDDDD8] px-2 py-1 text-sm dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC]"
                               />
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <div className="flex justify-end gap-2">
-                                <button
-                                  onClick={() => handleUpdate(user.id)}
-                                  className="rounded p-1.5 text-green-600 transition-colors hover:bg-green-50 dark:hover:bg-green-950"
-                                >
-                                  <Save className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={handleCancel}
-                                  className="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-                                >
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </td>
-                          </>
-                        )
-                      : (
-                          <>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1b1b18] text-white dark:bg-[#EDEDEC] dark:text-[#1b1b18]">
-                                  {user.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                  <div className="font-medium text-[#1b1b18] dark:text-[#EDEDEC]">{user.name}</div>
-                                  <div className="text-sm text-[#706f6c] dark:text-[#A1A09A]">{user.email}</div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F5F5F0] px-3 py-1 text-xs font-medium text-[#1b1b18] dark:bg-[#2d2d28] dark:text-[#EDEDEC]">
-                                <Shield className="h-3 w-3" />
-                                {roleLabels[user.role]}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span
-                                className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${user.is_active
-                                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                  : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                                }`}
+                              <input
+                                type="email"
+                                value={editForm.email}
+                                onChange={e => setEditForm({ ...editForm, email: e.target.value })}
+                                className="rounded border border-[#DDDDD8] px-2 py-1 text-sm dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC]"
+                              />
+                              <input
+                                type="password"
+                                placeholder="Nueva contraseña (opcional)"
+                                value={editForm.password || ''}
+                                onChange={e => setEditForm({ ...editForm, password: e.target.value })}
+                                className="rounded border border-[#DDDDD8] px-2 py-1 text-sm dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC]"
+                              />
+                              <input
+                                type="password"
+                                placeholder="Confirmar contraseña"
+                                value={editForm.password_confirmation || ''}
+                                onChange={e => setEditForm({ ...editForm, password_confirmation: e.target.value })}
+                                className="rounded border border-[#DDDDD8] px-2 py-1 text-sm dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC]"
+                              />
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <select
+                              value={editForm.role}
+                              onChange={e => setEditForm({ ...editForm, role: e.target.value as UserRole })}
+                              className="rounded border border-[#DDDDD8] px-2 py-1 text-sm dark:border-[#2d2d28] dark:bg-[#0f0f0e] dark:text-[#EDEDEC]"
+                            >
+                              <option value="cashier">Cajero/a</option>
+                              <option value="accountant">Contador/a</option>
+                              <option value="admin">Administrador</option>
+                            </select>
+                          </td>
+                          <td className="px-6 py-4">
+                            <input
+                              type="checkbox"
+                              checked={editForm.is_active}
+                              onChange={e => setEditForm({ ...editForm, is_active: e.target.checked })}
+                              className="h-4 w-4 rounded border-[#DDDDD8] dark:border-[#2d2d28] dark:bg-[#0f0f0e]"
+                            />
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => handleUpdate(user.id)}
+                                className="rounded p-1.5 text-green-600 transition-colors hover:bg-green-50 dark:hover:bg-green-950"
                               >
-                                {user.is_active ? 'Activo' : 'Inactivo'}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <div className="flex justify-end gap-2">
-                                <button
-                                  onClick={() => handleEdit(user)}
-                                  className="rounded p-1.5 text-blue-600 transition-colors hover:bg-blue-50 dark:hover:bg-blue-950"
-                                >
-                                  <Edit2 className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(user.id)}
-                                  className="rounded p-1.5 text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-950"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
+                                <Save className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={handleCancel}
+                                className="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      )
+                      : (
+                        <>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1b1b18] text-white dark:bg-[#EDEDEC] dark:text-[#1b1b18]">
+                                {user.name.charAt(0).toUpperCase()}
                               </div>
-                            </td>
-                          </>
-                        )}
+                              <div>
+                                <div className="font-medium text-[#1b1b18] dark:text-[#EDEDEC]">{user.name}</div>
+                                <div className="text-sm text-[#706f6c] dark:text-[#A1A09A]">{user.email}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F5F5F0] px-3 py-1 text-xs font-medium text-[#1b1b18] dark:bg-[#2d2d28] dark:text-[#EDEDEC]">
+                              <Shield className="h-3 w-3" />
+                              {roleLabels[user.role]}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${user.is_active
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                                }`}
+                            >
+                              {user.is_active ? 'Activo' : 'Inactivo'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => handleEdit(user)}
+                                className="rounded p-1.5 text-blue-600 transition-colors hover:bg-blue-50 dark:hover:bg-blue-950"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(user.id)}
+                                className="rounded p-1.5 text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-950"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      )}
                   </tr>
                 ))}
               </tbody>
