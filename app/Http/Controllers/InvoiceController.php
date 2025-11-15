@@ -90,6 +90,11 @@ class InvoiceController extends Controller
         $cuentaCostoVentas = \App\Models\Account::where('code', '6135')->first();
         $cuentaInventario = \App\Models\Account::where('code', '1435')->first();
 
+        // Validar que todas las cuentas existan
+        if (!$cuentaCaja || !$cuentaClientes || !$cuentaIvaPorPagar || !$cuentaIngresoVentas || !$cuentaCostoVentas || !$cuentaInventario) {
+            throw new \Exception('Error: Las cuentas contables no están configuradas correctamente. Por favor ejecute el seeder de cuentas.');
+        }
+
         // Débito: Caja o Clientes (si es crédito)
         $cuentaDebito = $invoice->payment_method === 'credit' ? $cuentaClientes : $cuentaCaja;
         Transaction::create([

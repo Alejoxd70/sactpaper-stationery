@@ -49,8 +49,9 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Ejecutar seeders de clientes y productos
+        // Ejecutar seeders
         $this->call([
+            AccountSeeder::class,
             CustomerSeeder::class,
             ProductSeeder::class,
         ]);
