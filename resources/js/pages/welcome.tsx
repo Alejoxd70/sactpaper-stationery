@@ -27,7 +27,7 @@ export default function Welcome() {
                   SACTPAPER
                 </h1>
                 <p className="mb-6 text-xl text-[#706f6c] lg:text-2xl dark:text-[#A1A09A]">
-                  Sistema de gestión integral para papelerías
+                  Sistema de gestión integral para tu papelería
                 </p>
                 <p className="mx-auto max-w-2xl text-[15px] leading-relaxed text-[#706f6c] dark:text-[#A1A09A]">
                   Administra inventario, ventas, facturación electrónica y contabilidad. Sistema completo con roles de usuario y control total de tu negocio.

@@ -26,3 +26,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+documentacion_txt.txt
+generar_documentacion.py
+SACTPAPER_Documentacion_Completa.docx
