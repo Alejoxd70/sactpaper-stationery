@@ -297,7 +297,7 @@
 
     <!-- Ventas -->
     <div class="section">
-        <div class="section-title">📊 Ventas</div>
+        <div class="section-title">Ventas</div>
         <div class="card">
             <div class="stat-grid">
                 <div class="stat-item">
@@ -355,24 +355,11 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="payment-method">
-                    <div class="payment-method-header">
-                        <div class="payment-method-label">Crédito</div>
-                        <div class="payment-method-value">
-                            ${{ number_format($sales['by_payment_method']['credit'], 0, ',', '.') }}</div>
-                    </div>
-                    <div class="payment-bar">
-                        <div class="payment-bar-fill"
-                            style="width: {{ $sales['total'] > 0 ? ($sales['by_payment_method']['credit'] / $sales['total'] * 100) : 0 }}%;">
-                        </div>
-                    </div>
-                </div>
             </div>
 
             @if($sales['pending'] > 0)
                 <div class="alert-box">
-                    <div class="alert-title">⚠ Pendiente por cobrar</div>
+                    <div class="alert-title">Pendiente por cobrar</div>
                     <div class="alert-value">${{ number_format($sales['pending'], 0, ',', '.') }}</div>
                 </div>
             @endif
@@ -383,7 +370,7 @@
     <div class="two-col">
         <div class="col-50">
             <div class="section">
-                <div class="section-title">📦 Inventario</div>
+                <div class="section-title">Inventario</div>
                 <div class="card">
                     <div class="stat-label">Valor Total</div>
                     <div class="stat-value" style="margin-bottom: 10px;">
@@ -391,7 +378,7 @@
 
                     @if($inventory['low_stock_count'] > 0)
                         <div class="alert-box danger">
-                            <div class="alert-title">🚨 Productos con stock bajo</div>
+                            <div class="alert-title">Productos con stock bajo</div>
                             <div class="alert-value">{{ $inventory['low_stock_count'] }}</div>
                         </div>
                     @endif
@@ -401,7 +388,7 @@
 
         <div class="col-50">
             <div class="section">
-                <div class="section-title">🏆 Top 5 Productos</div>
+                <div class="section-title">Top 5 Productos</div>
                 <table>
                     <thead>
                         <tr>
@@ -426,7 +413,7 @@
 
     <!-- Estado de Pérdidas y Ganancias -->
     <div class="section">
-        <div class="section-title">💰 Estado de Pérdidas y Ganancias</div>
+        <div class="section-title">Estado de Pérdidas y Ganancias</div>
         <div class="card">
             <div class="pl-row">
                 <div class="pl-label">Ingresos</div>

@@ -183,7 +183,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
                         'cash' => $sales->where('payment_method', 'cash')->sum('total'),
                         'card' => $sales->where('payment_method', 'card')->sum('total'),
                         'transfer' => $sales->where('payment_method', 'transfer')->sum('total'),
-                        'credit' => $sales->where('payment_method', 'credit')->sum('total'),
                     ],
                     'pending' => $sales->where('payment_status', 'pending')->sum('total'),
                 ],
