@@ -130,20 +130,19 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                 <option value="cash">Efectivo</option>
                 <option value="card">Tarjeta</option>
                 <option value="transfer">Transferencia</option>
-                <option value="credit">Crédito</option>
               </select>
             </div>
           </div>
 
           <div className="mb-6">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h3 className="text-lg font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">Productos</h3>
               <button
                 type="button"
                 onClick={addItem}
-                className="rounded-sm border border-[#1b1b18] bg-[#1b1b18] px-4 py-2 text-sm text-white hover:bg-[#2d2d28] dark:border-[#EDEDEC] dark:bg-[#EDEDEC] dark:text-[#1b1b18]"
+                className="flex w-full items-center justify-center gap-2 rounded-sm border border-[#1b1b18] bg-[#1b1b18] px-4 py-2.5 text-sm text-white hover:bg-[#2d2d28] dark:border-[#EDEDEC] dark:bg-[#EDEDEC] dark:text-[#1b1b18] sm:w-auto"
               >
-                <Plus className="mr-2 inline h-4 w-4" />
+                <Plus className="h-4 w-4" />
                 Agregar Producto
               </button>
             </div>
@@ -153,12 +152,16 @@ export default function NewSale({ products, customers }: NewSaleProps) {
               const hasStockError = selectedProduct && item.quantity > selectedProduct.stock
 
               return (
-                <div key={index} className="mb-3">
-                  <div className="flex gap-3">
+                <div key={index} className="mb-4 rounded-lg border border-[#19140035] bg-[#fafaf9] p-4 dark:border-[#3E3E3A] dark:bg-[#1f1f1e]">
+                  {/* Selector de Producto */}
+                  <div className="mb-3">
+                    <label className="mb-1.5 block text-xs font-medium text-[#706f6c] dark:text-[#A1A09A]">
+                      Producto
+                    </label>
                     <select
                       value={item.product_id}
                       onChange={e => updateItem(index, 'product_id', e.target.value)}
-                      className="flex-1 rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
+                      className="w-full rounded-sm border border-[#19140035] bg-white px-3 py-2.5 text-sm text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
                       required
                     >
                       <option value="">Seleccionar producto</option>
@@ -167,7 +170,7 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                           {p.name}
                           {' '}
                           - $
-                          {p.unit_price}
+                          {p.unit_price.toLocaleString()}
                           {' '}
                           (Stock:
                           {' '}
@@ -176,36 +179,61 @@ export default function NewSale({ products, customers }: NewSaleProps) {
                         </option>
                       ))}
                     </select>
+                  </div>
 
-                    <input
-                      type="number"
-                      value={item.quantity}
-                      onChange={e => updateItem(index, 'quantity', parseInt(e.target.value))}
-                      className={`w-24 rounded-sm border px-4 py-2 ${hasStockError ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-[#19140035] bg-white dark:border-[#3E3E3A] dark:bg-[#161615]'} text-[#1b1b18] dark:text-[#EDEDEC]`}
-                      min="1"
-                      max={selectedProduct?.stock || undefined}
-                      required
-                    />
+                  {/* Cantidad y Precio */}
+                  <div className="mb-3 grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-[#706f6c] dark:text-[#A1A09A]">
+                        Cantidad
+                      </label>
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={e => updateItem(index, 'quantity', parseInt(e.target.value))}
+                        className={`w-full rounded-sm border px-3 py-2.5 text-sm ${hasStockError ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-[#19140035] bg-white dark:border-[#3E3E3A] dark:bg-[#161615]'} text-[#1b1b18] dark:text-[#EDEDEC]`}
+                        min="1"
+                        max={selectedProduct?.stock || undefined}
+                        required
+                      />
+                    </div>
 
-                    <input
-                      type="number"
-                      value={item.unit_price}
-                      onChange={e => updateItem(index, 'unit_price', parseFloat(e.target.value))}
-                      className="w-32 rounded-sm border border-[#19140035] bg-white px-4 py-2 text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
-                      step="0.01"
-                      required
-                    />
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-[#706f6c] dark:text-[#A1A09A]">
+                        Precio Unit.
+                      </label>
+                      <input
+                        type="number"
+                        value={item.unit_price}
+                        onChange={e => updateItem(index, 'unit_price', parseFloat(e.target.value))}
+                        className="w-full rounded-sm border border-[#19140035] bg-white px-3 py-2.5 text-sm text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#EDEDEC]"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                  </div>
 
+                  {/* Subtotal y Botón Eliminar */}
+                  <div className="flex items-center justify-between border-t border-[#19140035] pt-3 dark:border-[#3E3E3A]">
+                    <div className="text-sm">
+                      <span className="text-[#706f6c] dark:text-[#A1A09A]">Subtotal: </span>
+                      <span className="font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                        $
+                        {(item.quantity * item.unit_price).toLocaleString('es-CO', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
                     <button
                       type="button"
                       onClick={() => removeItem(index)}
-                      className="rounded-sm border border-red-500 px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      className="rounded-sm border border-red-500 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
+
+                  {/* Mensaje de Error de Stock */}
                   {hasStockError && (
-                    <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
+                    <p className="mt-3 flex items-center gap-1 rounded-sm bg-red-50 p-2 text-xs text-red-600 dark:bg-red-900/20 dark:text-red-400">
                       <AlertTriangle className="h-3 w-3" />
                       Stock insuficiente. Disponible:
                       {' '}
@@ -241,16 +269,16 @@ export default function NewSale({ products, customers }: NewSaleProps) {
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button
               type="submit"
-              className="rounded-sm border border-[#1b1b18] bg-[#1b1b18] px-6 py-3 text-sm text-white hover:bg-[#2d2d28] dark:border-[#EDEDEC] dark:bg-[#EDEDEC] dark:text-[#1b1b18]"
+              className="w-full rounded-sm border border-[#1b1b18] bg-[#1b1b18] px-6 py-3 text-sm font-medium text-white hover:bg-[#2d2d28] dark:border-[#EDEDEC] dark:bg-[#EDEDEC] dark:text-[#1b1b18] sm:w-auto"
             >
               Registrar Venta
             </button>
             <Link
               href="/sales"
-              className="rounded-sm border border-[#19140035] px-6 py-3 text-sm text-[#1b1b18] hover:bg-[#fafaf9] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:bg-[#1f1f1e]"
+              className="w-full rounded-sm border border-[#19140035] px-6 py-3 text-center text-sm text-[#1b1b18] hover:bg-[#fafaf9] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:bg-[#1f1f1e] sm:w-auto"
             >
               Cancelar
             </Link>

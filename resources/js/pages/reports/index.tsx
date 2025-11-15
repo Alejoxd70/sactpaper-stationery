@@ -63,7 +63,6 @@ export default function ReportsIndex({ data, startDate: initialStartDate, endDat
     { key: 'cash', label: 'Efectivo', value: data.sales.by_payment_method.cash },
     { key: 'card', label: 'Tarjeta', value: data.sales.by_payment_method.card },
     { key: 'transfer', label: 'Transferencia', value: data.sales.by_payment_method.transfer },
-    { key: 'credit', label: 'Crédito', value: data.sales.by_payment_method.credit },
   ]
 
   const maxPaymentValue = Math.max(...paymentMethods.map(pm => pm.value))
