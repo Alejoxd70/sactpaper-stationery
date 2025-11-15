@@ -31,10 +31,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Ventas
     Route::get('sales', function () {
+        $startDate = request('start_date', today()->format('Y-m-d'));
+        $endDate = request('end_date', today()->format('Y-m-d'));
+
         $invoices = \App\Models\Invoice::with(['customer', 'user', 'items.product'])
+            ->whereBetween(DB::raw('DATE(date)'), [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
-            ->get();
-        return Inertia::render('sales/index', ['invoices' => $invoices]);
+            ->get()
+            ->map(function ($invoice) {
+                $data = $invoice->toArray();
+                $data['date'] = $invoice->date->format('Y-m-d H:i:s');
+                return $data;
+            });
+
+        return Inertia::render('sales/index', [
+            'invoices' => $invoices,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ]);
     })->name('sales');
 
     Route::get('sales/new', function () {
