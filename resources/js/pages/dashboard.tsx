@@ -14,9 +14,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface DashboardProps {
   stats: {
     today_sales: number
+    yesterday_sales: number
+    sales_change: number
     pending_invoices: number
     low_stock_products: number
     total_customers: number
+    new_customers_this_month: number
   }
 }
 
@@ -46,11 +49,30 @@ export default function Dashboard({ stats }: DashboardProps) {
                   $
                   {stats.today_sales.toLocaleString('es-CO')}
                 </p>
-                <div className="mt-2 flex items-center gap-1 text-xs">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  <span className="font-medium text-green-600 dark:text-green-400">+12%</span>
-                  <span className="text-[#706f6c] dark:text-[#A1A09A]">vs ayer</span>
-                </div>
+                {stats.sales_change !== 0 && (
+                  <div className="mt-2 flex items-center gap-1 text-xs">
+                    <TrendingUp
+                      className={`h-3 w-3 ${stats.sales_change >= 0 ? 'text-green-500' : 'rotate-180 text-red-500'}`}
+                    />
+                    <span
+                      className={`font-medium ${stats.sales_change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                    >
+                      {stats.sales_change > 0 ? '+' : ''}
+                      {stats.sales_change}%
+                    </span>
+                    <span className="text-[#706f6c] dark:text-[#A1A09A]">vs ayer</span>
+                  </div>
+                )}
+                {stats.sales_change === 0 && stats.yesterday_sales > 0 && (
+                  <div className="mt-2 flex items-center gap-1 text-xs">
+                    <span className="text-[#706f6c] dark:text-[#A1A09A]">Sin cambio vs ayer</span>
+                  </div>
+                )}
+                {stats.sales_change === 0 && stats.yesterday_sales === 0 && stats.today_sales > 0 && (
+                  <div className="mt-2 flex items-center gap-1 text-xs">
+                    <span className="font-medium text-green-600 dark:text-green-400">Primera venta del período</span>
+                  </div>
+                )}
               </div>
               <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900/30">
                 <DollarSign className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -116,11 +138,20 @@ export default function Dashboard({ stats }: DashboardProps) {
                 <p className="mt-2 text-3xl font-bold text-[#1b1b18] dark:text-[#EDEDEC]">
                   {stats.total_customers}
                 </p>
-                <div className="mt-2 flex items-center gap-1 text-xs">
-                  <ArrowUpRight className="h-3 w-3 text-green-500" />
-                  <span className="font-medium text-green-600 dark:text-green-400">+5</span>
-                  <span className="text-[#706f6c] dark:text-[#A1A09A]">este mes</span>
-                </div>
+                {stats.new_customers_this_month > 0 && (
+                  <div className="mt-2 flex items-center gap-1 text-xs">
+                    <ArrowUpRight className="h-3 w-3 text-green-500" />
+                    <span className="font-medium text-green-600 dark:text-green-400">
+                      +{stats.new_customers_this_month}
+                    </span>
+                    <span className="text-[#706f6c] dark:text-[#A1A09A]">este mes</span>
+                  </div>
+                )}
+                {stats.new_customers_this_month === 0 && (
+                  <div className="mt-2 flex items-center gap-1 text-xs">
+                    <span className="text-[#706f6c] dark:text-[#A1A09A]">Sin nuevos clientes este mes</span>
+                  </div>
+                )}
               </div>
               <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900/30">
                 <Users className="h-6 w-6 text-green-600 dark:text-green-400" />

@@ -19,11 +19,34 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
+        // Ventas de hoy
+        $todaySales = \App\Models\Invoice::whereBetween(DB::raw('DATE(date)'), [today()->format('Y-m-d'), today()->format('Y-m-d')])->sum('total');
+        
+        // Ventas de ayer
+        $yesterdaySales = \App\Models\Invoice::whereBetween(DB::raw('DATE(date)'), [today()->subDay()->format('Y-m-d'), today()->subDay()->format('Y-m-d')])->sum('total');
+        
+        // Calcular porcentaje de cambio vs ayer
+        $salesChange = 0;
+        if ($yesterdaySales > 0) {
+            $salesChange = (($todaySales - $yesterdaySales) / $yesterdaySales) * 100;
+        } elseif ($todaySales > 0) {
+            $salesChange = 100;
+        }
+        
+        // Clientes nuevos este mes
+        $newCustomersThisMonth = \App\Models\Customer::whereMonth('created_at', today()->month)
+            ->whereYear('created_at', today()->year)
+            ->where('is_active', true)
+            ->count();
+        
         $stats = [
-            'today_sales' => \App\Models\Invoice::whereBetween(DB::raw('DATE(date)'), [today()->format('Y-m-d'), today()->format('Y-m-d')])->sum('total'),
+            'today_sales' => $todaySales,
+            'yesterday_sales' => $yesterdaySales,
+            'sales_change' => round($salesChange, 1),
             'pending_invoices' => \App\Models\Invoice::where('payment_status', 'pending')->count(),
             'low_stock_products' => \App\Models\Product::whereColumn('stock', '<=', 'min_stock')->count(),
             'total_customers' => \App\Models\Customer::where('is_active', true)->count(),
+            'new_customers_this_month' => $newCustomersThisMonth,
         ];
         
         return Inertia::render('dashboard', ['stats' => $stats]);
